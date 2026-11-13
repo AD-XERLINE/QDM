@@ -80,7 +80,7 @@ h3 { font-size: 16px; font-weight: 600; margin: 24px 0 8px; color: var(--muted);
   max-height: calc(100vh - 112px); overflow-y: auto;
 }
 .panel > h2 { margin-bottom: 12px; }
-.cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap); }
+.cards { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--gap); }
 .card {
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
   box-shadow: var(--shadow); padding: 20px; min-width: 0;
@@ -181,13 +181,13 @@ input[type=range]::-moz-range-thumb {
 /* Chart text */
 .chart text { font-family: inherit; font-size: 13px; fill: var(--muted); }
 .chart .label-strong { font-weight: 600; fill: var(--text); }
+.chart text { paint-order: stroke; stroke: var(--surface); stroke-width: 4px; stroke-linejoin: round; }
 .chart .axis-title { font-size: 13px; fill: var(--muted); }
 .chart .grid { stroke: var(--border); stroke-width: 1; }
 .chart .drag { cursor: ew-resize; }
 
 @media (max-width: 1180px) {
   .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .cards { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 900px) {
   .layout { grid-template-columns: minmax(0, 1fr); padding: 16px; }

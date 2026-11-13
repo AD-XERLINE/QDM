@@ -1,5 +1,6 @@
 import { evaluateTiers, bestOffer, suggestProposal, evaluateProposal } from './model.js';
 import { DEFAULT_STATE, MAX_TIERS, validate, encodeState, decodeState } from './state.js';
+import { qMax, renderTcChart, renderPriceChart } from './charts.js';
 
 const $ = id => document.getElementById(id);
 
@@ -19,13 +20,6 @@ export function computeView(state) {
   const qn = state.qn ?? suggested.qn;
   const pn = state.pn ?? suggested.pn;
   return { params, tiers: state.tiers, results, best, qn, pn, proposal: evaluateProposal(qn, pn, params, best) };
-}
-
-// shortcut: interim lot-size axis until charts.js provides qMax
-function qMax(tiers, results, qn) {
-  const lastMin = tiers[tiers.length - 1].minQty;
-  const topStar = Math.max(...results.map(r => r.qStar));
-  return Math.ceil(Math.max(1.25 * lastMin, 3 * topStar, 1.2 * qn) / 100) * 100;
 }
 
 // ---------- state ----------
@@ -200,9 +194,18 @@ function syncProposalRanges(v) {
   pnRange.max = String(Math.max(...prices));
 }
 
-// Hook for charts (Task 5).
-let drawCharts = () => {};
-export function setChartRenderer(fn) { drawCharts = fn; }
+// One chart redraw per animation frame, however fast the sliders move.
+let pendingView = null;
+function drawCharts(v) {
+  if (pendingView === null) {
+    requestAnimationFrame(() => {
+      renderTcChart($('tc-chart'), pendingView, setProposalQty);
+      renderPriceChart($('price-chart'), pendingView);
+      pendingView = null;
+    });
+  }
+  pendingView = v;
+}
 
 function render() {
   const { ok, errors } = validate(state);
