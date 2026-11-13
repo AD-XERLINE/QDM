@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { tc, eoq, evaluateTiers, bestOffer } from '../js/model.js';
+import { tc, eoq, evaluateTiers, bestOffer, breakEvenPrice, suggestProposal, evaluateProposal } from '../js/model.js';
 
 const near = (a, b, eps = 0.005) => assert.ok(Math.abs(a - b) <= eps, `${a} != ${b}`);
 const BEE = { D: 5000, S: 49, I: 0.2 };
@@ -48,4 +48,34 @@ test('Q* บนขอบของช่วงพอดีเป็น feasible',
 test('ราคาไม่ลดตามปริมาณก็ยังเลือก TC ต่ำสุด', () => {
   const r = evaluateTiers(BEE, [{ minQty: 0, price: 4.8 }, { minQty: 1000, price: 5 }]);
   assert.equal(bestOffer(r).index, 0);
+});
+
+test('ราคาเท่าทุน', () => {
+  near(breakEvenPrice(700, 24725, BEE), 4.8077, 0.0001);
+  near(breakEvenPrice(1000, 24725, BEE), 4.8, 1e-9);
+  near(breakEvenPrice(2000, 24725, BEE), 4.7312, 0.0001);
+});
+
+test('ค่าแนะนำ = ราคาของข้อเสนอที่ดีที่สุด และ EOQ ที่ราคานั้น', () => {
+  const best = bestOffer(evaluateTiers(BEE, BEE_TIERS));
+  assert.deepEqual(suggestProposal(BEE, best), { qn: 714, pn: 4.8 });
+});
+
+test('ข้อเสนอต่อรอง (714, 4.80)', () => {
+  const best = bestOffer(evaluateTiers(BEE, BEE_TIERS));
+  const r = evaluateProposal(714, 4.8, BEE, best);
+  near(r.cost.total, 24685.86); near(r.saving, 39.14);
+  near(r.ordersPerYear, 7.003, 0.001); near(r.daysBetweenOrders, 52.12, 0.01);
+  assert.equal(r.avgInventory, 357); assert.equal(r.bestAvgInventory, 500);
+  near(r.breakEven, 4.8077, 0.0001);
+});
+
+test('ข้อเสนอที่แพงกว่าเดิมให้ saving ติดลบ', () => {
+  const best = bestOffer(evaluateTiers(BEE, BEE_TIERS));
+  assert.ok(evaluateProposal(2000, 4.75, BEE, best).saving < 0);
+});
+
+test('ล็อตเล็กจนไม่มีราคาที่คุ้มให้ breakEven เป็น null', () => {
+  const best = bestOffer(evaluateTiers(BEE, BEE_TIERS));
+  assert.equal(evaluateProposal(1, 4.8, BEE, best).breakEven, null);
 });

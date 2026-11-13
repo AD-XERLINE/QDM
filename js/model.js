@@ -35,3 +35,27 @@ export function bestOffer(results) {
     .filter(r => r.status !== 'discarded')
     .reduce((best, r) => (best === null || r.cost.total < best.cost.total ? r : best), null);
 }
+
+// Highest unit price at lot size Q whose TC does not exceed tcBest. May be <= 0.
+export function breakEvenPrice(Q, tcBest, { D, S, I }) {
+  return (tcBest - (D / Q) * S) / (D + (Q * I) / 2);
+}
+
+// "Keep the shop's best price, but order the lot size that suits us."
+export function suggestProposal(params, best) {
+  return { qn: Math.max(1, Math.round(eoq(best.price, params))), pn: best.price };
+}
+
+export function evaluateProposal(qn, pn, params, best) {
+  const cost = tc(qn, pn, params);
+  const be = breakEvenPrice(qn, best.cost.total, params);
+  return {
+    cost,
+    saving: best.cost.total - cost.total,
+    ordersPerYear: params.D / qn,
+    daysBetweenOrders: (365 * qn) / params.D,
+    avgInventory: qn / 2,
+    bestAvgInventory: best.qty / 2,
+    breakEven: be > 0 ? be : null,
+  };
+}
