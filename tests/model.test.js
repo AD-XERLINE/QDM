@@ -32,10 +32,23 @@ test('ช่วงเดียวจากรูป EOQ', () => {
   near(t.cost.ordering, 2065.22, 0.01); near(t.cost.holding, 2070);
 });
 
-test('Q* สูงกว่าขอบบนถูกตัดทิ้งและไม่ถูกเลือก', () => {
+test('Q* สูงกว่าขอบบนถูกปัดลงเป็นขอบบน และไม่ชนะช่วงที่ถูกกว่า', () => {
   const r = evaluateTiers(BEE, [{ minQty: 0, price: 5 }, { minQty: 500, price: 4.8 }]);
-  assert.equal(r[0].status, 'discarded'); assert.equal(r[0].cost, null);
+  assert.equal(r[0].status, 'capped'); assert.equal(r[0].qty, 499);
+  near(r[0].cost.total, tc(499, 5, BEE).total);
   assert.equal(r[1].status, 'feasible'); assert.equal(bestOffer(r).index, 1);
+});
+
+test('ราคาสูงขึ้นตามปริมาณ: ช่วงที่ Q* เกินขอบบนยังแข่งได้ที่ขอบบน', () => {
+  const r = evaluateTiers(BEE, [{ minQty: 0, price: 4 }, { minQty: 500, price: 5 }]);
+  assert.equal(bestOffer(r).index, 0); assert.equal(bestOffer(r).qty, 499);
+  near(bestOffer(r).cost.total, 20690.58, 0.01);
+});
+
+test('Q* ที่ปัดแล้วเกินขอบบน 1 หน่วยใช้ขอบบน', () => {
+  // Q*(4.8) = 714.43 -> 714; boundary 713 -> capped at 713
+  const r = evaluateTiers(BEE, [{ minQty: 0, price: 4.8 }, { minQty: 714, price: 4.7 }]);
+  assert.equal(r[0].status, 'capped'); assert.equal(r[0].qty, 713);
 });
 
 test('Q* บนขอบของช่วงพอดีเป็น feasible', () => {

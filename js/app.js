@@ -9,7 +9,7 @@ const fmt = (v, dp) => v.toLocaleString('en-US', { minimumFractionDigits: dp, ma
 const baht = (v, dp = 2) => (v < 0 ? '−฿' : '฿') + fmt(Math.abs(v), dp);
 const qty = v => fmt(v, Number.isInteger(v) ? 0 : 1);
 const tierColor = i => `var(--tier-${(i % 6) + 1})`;
-const STATUS = { feasible: 'ใช้ได้', adjusted: 'ปรับขึ้น', discarded: 'ตัดทิ้ง' };
+const STATUS = { feasible: 'ใช้ได้', adjusted: 'ปรับขึ้น', capped: 'ปรับลง' };
 
 // ---------- view model ----------
 export function computeView(state) {
@@ -158,19 +158,18 @@ function renderProposal(v) {
 function renderTable(v) {
   const { results, best, proposal: p, qn, pn } = v;
   const tcBest = best.cost.total;
-  const cell = c => (c === null ? '—' : baht(c));
   const diff = d => (Math.abs(d) < 0.005 ? '—' : `<span class="${d > 0 ? 'neg' : 'pos'}">${d > 0 ? '+' : '−'}${baht(Math.abs(d))}</span>`);
   const rows = results.map(r => {
     const range = r.maxQty === Infinity ? `${fmt(r.minQty, 0)} ขึ้นไป` : `${fmt(r.minQty, 0)}–${fmt(r.maxQty, 0)}`;
     const isBest = r === best;
     const c = r.cost;
-    return `<tr class="${isBest ? 'best' : ''} ${r.status === 'discarded' ? 'discarded' : ''}">
+    return `<tr class="${isBest ? 'best' : ''}">
       <td><span class="tier-tag"><span class="swatch" style="background:${tierColor(r.index)}"></span>ช่วง ${r.index + 1} (${range})</span></td>
       <td>${baht(r.price)}</td>
-      <td>${r.qty === null ? `— <small>(Q* ${fmt(r.qStar, 0)})</small>` : fmt(r.qty, 0)}${r.status === 'adjusted' ? ` <small>(Q* ${fmt(r.qStar, 0)})</small>` : ''}</td>
-      <td>${cell(c && c.product)}</td><td>${cell(c && c.ordering)}</td><td>${cell(c && c.holding)}</td>
-      <td>${cell(c && c.total)}</td>
-      <td>${c ? diff(c.total - tcBest) : '—'}</td>
+      <td>${fmt(r.qty, 0)}${r.status !== 'feasible' ? ` <small>(Q* ${fmt(r.qStar, 0)})</small>` : ''}</td>
+      <td>${baht(c.product)}</td><td>${baht(c.ordering)}</td><td>${baht(c.holding)}</td>
+      <td>${baht(c.total)}</td>
+      <td>${diff(c.total - tcBest)}</td>
       <td>${isBest ? '<span class="badge best">ดีที่สุดของร้าน</span>' : `<span class="badge">${STATUS[r.status]}</span>`}</td>
     </tr>`;
   });

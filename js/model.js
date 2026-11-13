@@ -22,18 +22,18 @@ export function evaluateTiers(params, tiers) {
     let status = 'feasible';
     let qty = qStar;
     if (qStar < lower) { status = 'adjusted'; qty = lower; }
-    else if (qStar > maxQty) { status = 'discarded'; qty = null; }
+    // Textbook QDM discards this tier; costing it at its upper bound gives the same answer for
+    // falling price tables and stays correct when a larger lot costs more per unit.
+    else if (qStar > maxQty) { status = 'capped'; qty = maxQty; }
     return {
       index, minQty: tier.minQty, maxQty, price: tier.price, qStar, qty, status,
-      cost: status === 'discarded' ? null : tc(qty, tier.price, params),
+      cost: tc(qty, tier.price, params),
     };
   });
 }
 
 export function bestOffer(results) {
-  return results
-    .filter(r => r.status !== 'discarded')
-    .reduce((best, r) => (best === null || r.cost.total < best.cost.total ? r : best), null);
+  return results.reduce((best, r) => (best === null || r.cost.total < best.cost.total ? r : best), null);
 }
 
 // Highest unit price at lot size Q whose TC does not exceed tcBest. May be <= 0.

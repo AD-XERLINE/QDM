@@ -127,14 +127,14 @@ function ensureTcChart(svg) {
     evt.preventDefault();
   });
   handle.addEventListener('pointermove', evt => { if (drag.active) s.onDragQ(qAt(evt)); });
-  const end = evt => {
+  const end = q => {
     if (!drag.active) return;
-    const q = qAt(evt);
     drag.active = false;
     s.onDragQ(q); // re-render with a fresh axis
   };
-  handle.addEventListener('pointerup', end);
-  handle.addEventListener('pointercancel', end);
+  handle.addEventListener('pointerup', evt => end(qAt(evt)));
+  // A cancelled pointer carries no reliable position: keep the last rendered lot size.
+  handle.addEventListener('pointercancel', () => end(s.qn));
   tcState.set(svg, s);
   return s;
 }
@@ -147,7 +147,7 @@ export function renderTcChart(svg, view, onDragQ) {
   const [lo, hi] = tcYDomain(view, xMax);
   const ys = linearScale([lo, hi], [Y1, Y0]);
   const { ticks } = niceTicks(lo, hi, 5);
-  Object.assign(s, { xs, xMax, onDragQ });
+  Object.assign(s, { xs, xMax, onDragQ, qn });
 
   const g = frame(svg, 'clip-tc', xs, ys, ticks, v => '฿' + fmt(v), 'TC ต่อปี (฿)');
   priceBreakLines(g, view, xs, xMax);
