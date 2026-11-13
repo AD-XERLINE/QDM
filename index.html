@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QDM Negotiator</title>
+  <meta name="description" content="หาข้อเสนอต่อรองราคาด้วย EOQ และ Quantity Discount Model">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">Q</span>
+      <div>
+        <h1>QDM Negotiator</h1>
+        <p class="tagline">ต่อรองราคาด้วย EOQ และ Quantity Discount Model</p>
+      </div>
+    </div>
+    <div class="actions">
+      <button type="button" id="copy-link" class="btn">คัดลอกลิงก์</button>
+      <button type="button" id="reset" class="btn btn-ghost">รีเซ็ต</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="panel" aria-labelledby="assumptions-title">
+      <h2 id="assumptions-title">สมมติฐาน</h2>
+
+      <div class="field" data-key="D">
+        <div class="field-head">
+          <label for="D-num"><b>D</b> ความต้องการต่อปี</label>
+          <span class="unit">ชิ้น/ปี</span>
+        </div>
+        <div class="field-row">
+          <input type="range" id="D-range" min="100" max="20000" step="50" aria-label="D ความต้องการต่อปี (slider)">
+          <input type="number" id="D-num" min="1" step="any" inputmode="decimal" aria-describedby="D-err">
+        </div>
+        <p class="err" id="D-err" role="alert"></p>
+      </div>
+
+      <div class="field" data-key="S">
+        <div class="field-head">
+          <label for="S-num"><b>S</b> ค่าสั่งซื้อต่อครั้ง</label>
+          <span class="unit">฿/ครั้ง</span>
+        </div>
+        <div class="field-row">
+          <input type="range" id="S-range" min="1" max="500" step="1" aria-label="S ค่าสั่งซื้อต่อครั้ง (slider)">
+          <input type="number" id="S-num" min="0" step="any" inputmode="decimal" aria-describedby="S-err">
+        </div>
+        <p class="err" id="S-err" role="alert"></p>
+      </div>
+
+      <div class="field" data-key="I">
+        <div class="field-head">
+          <label for="I-num"><b>I</b> อัตราค่าเก็บรักษา</label>
+          <span class="unit">% ของราคา/ปี</span>
+        </div>
+        <div class="field-row">
+          <input type="range" id="I-range" min="1" max="50" step="0.5" aria-label="I อัตราค่าเก็บรักษา (slider)">
+          <input type="number" id="I-num" min="0" step="any" inputmode="decimal" aria-describedby="I-err">
+        </div>
+        <p class="err" id="I-err" role="alert"></p>
+      </div>
+
+      <h3>ตารางส่วนลดของร้าน</h3>
+      <table class="tiers" aria-describedby="tiers-err">
+        <thead>
+          <tr><th scope="col">ช่วง</th><th scope="col">สั่งตั้งแต่ (ชิ้น)</th><th scope="col">ราคา (฿)</th><th scope="col"><span class="sr-only">ลบ</span></th></tr>
+        </thead>
+        <tbody id="tier-rows"></tbody>
+      </table>
+      <p class="err" id="tiers-err" role="alert"></p>
+      <button type="button" id="add-tier" class="btn btn-ghost btn-block">+ เพิ่มช่วง</button>
+      <p class="hint">H = I × ราคา จึงต่างกันในแต่ละช่วงราคา</p>
+    </aside>
+
+    <main class="cards">
+      <section class="card" aria-labelledby="c1-title">
+        <div class="card-head">
+          <span class="step">1</span>
+          <div>
+            <h2 id="c1-title">ข้อเสนอปัจจุบันของร้าน</h2>
+            <p class="sub" id="c1-sub"></p>
+          </div>
+        </div>
+        <svg id="tc-chart" class="chart" viewBox="0 0 800 360" preserveAspectRatio="xMidYMid meet"></svg>
+      </section>
+
+      <section class="card" aria-labelledby="c2-title">
+        <div class="card-head">
+          <span class="step">2</span>
+          <div>
+            <h2 id="c2-title">ราคาเท่าทุนของแต่ละขนาดล็อต</h2>
+            <p class="sub">ราคาสูงสุดที่ขอได้ในแต่ละล็อต โดย TC ยังไม่แย่กว่าข้อเสนอที่ดีที่สุดของร้าน</p>
+          </div>
+        </div>
+        <svg id="price-chart" class="chart" viewBox="0 0 800 360" preserveAspectRatio="xMidYMid meet"></svg>
+      </section>
+
+      <section class="card card-proposal" aria-labelledby="c3-title">
+        <div class="card-head">
+          <span class="step">3</span>
+          <div>
+            <h2 id="c3-title">ข้อเสนอต่อรอง</h2>
+            <p class="sub">เลื่อนล็อตและราคาที่จะขอ หรือลากจุด ◆ บนกราฟ 1</p>
+          </div>
+          <button type="button" id="suggest" class="btn btn-ghost btn-sm">ใช้ค่าแนะนำ</button>
+        </div>
+
+        <div class="proposal-inputs">
+          <div class="field" data-key="qn">
+            <div class="field-head">
+              <label for="qn-num">ล็อตที่ขอ</label>
+              <span class="unit">ชิ้น/ครั้ง</span>
+            </div>
+            <div class="field-row">
+              <input type="range" id="qn-range" min="1" step="1" aria-label="ล็อตที่ขอ (slider)">
+              <input type="number" id="qn-num" min="1" step="1" inputmode="numeric" aria-describedby="qn-err">
+            </div>
+            <p class="err" id="qn-err" role="alert"></p>
+          </div>
+          <div class="field" data-key="pn">
+            <div class="field-head">
+              <label for="pn-num">ราคาที่ขอ</label>
+              <span class="unit">฿/ชิ้น</span>
+            </div>
+            <div class="field-row">
+              <input type="range" id="pn-range" step="0.01" aria-label="ราคาที่ขอ (slider)">
+              <input type="number" id="pn-num" min="0" step="0.01" inputmode="decimal" aria-describedby="pn-err">
+            </div>
+            <p class="err" id="pn-err" role="alert"></p>
+          </div>
+        </div>
+
+        <div aria-live="polite">
+          <div class="verdict" id="verdict"></div>
+          <dl class="stats">
+            <div class="stat stat-main"><dt>TC ใหม่ต่อปี</dt><dd id="out-tc"></dd><span class="meta" id="out-tc-meta"></span></div>
+            <div class="stat stat-main"><dt id="out-saving-label">ประหยัดต่อปี</dt><dd id="out-saving"></dd><span class="meta" id="out-saving-meta"></span></div>
+            <div class="stat"><dt>จำนวนครั้งที่สั่ง</dt><dd id="out-orders"></dd><span class="meta" id="out-orders-meta"></span></div>
+            <div class="stat"><dt>สต็อกเฉลี่ย</dt><dd id="out-inv"></dd><span class="meta" id="out-inv-meta"></span></div>
+            <div class="stat"><dt>ราคาเท่าทุนที่ล็อตนี้</dt><dd id="out-be"></dd><span class="meta">ขอราคาไม่เกินนี้จึงคุ้ม</span></div>
+          </dl>
+          <p class="summary" id="summary"></p>
+        </div>
+      </section>
+
+      <section class="card card-wide" aria-labelledby="c4-title">
+        <div class="card-head">
+          <span class="step">4</span>
+          <div>
+            <h2 id="c4-title">ตารางเปรียบเทียบ</h2>
+            <p class="sub">ทุกช่วงราคาของร้าน เทียบกับข้อเสนอต่อรอง</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="compare">
+            <thead>
+              <tr>
+                <th scope="col">ตัวเลือก</th><th scope="col">ราคา</th><th scope="col">Q</th>
+                <th scope="col">ค่าสินค้า</th><th scope="col">Ordering cost</th><th scope="col">Holding cost</th>
+                <th scope="col">TC</th><th scope="col">ส่วนต่างจาก TC ที่ดีที่สุด</th><th scope="col">สถานะ</th>
+              </tr>
+            </thead>
+            <tbody id="compare-rows"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer class="foot">
+    TC = D·P + (D/Q)·S + (Q/2)·I·P &nbsp;·&nbsp; Q* = √(2DS / IP) &nbsp;·&nbsp; ราคาเท่าทุน = (TC<sub>best</sub> − (D/Q)·S) / (D + Q·I/2)
+  </footer>
+</body>
+</html>
