@@ -1,0 +1,6 @@
+{
+  "name": "qdm-negotiator",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "node --test" }
+}
