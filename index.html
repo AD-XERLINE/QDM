@@ -12,23 +12,12 @@
   <script type="module" src="js/app.js"></script>
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <span class="logo" aria-hidden="true">Q</span>
-      <div>
-        <h1>QDM Negotiator</h1>
-        <p class="tagline">ต่อรองราคาด้วย EOQ และ Quantity Discount Model</p>
-      </div>
-    </div>
-    <p class="formula">TC = D·P + (D/Q)·S + (Q/2)·I·P &nbsp;·&nbsp; Q* = √(2DS / IP) &nbsp;·&nbsp; ราคาเท่าทุน = (TC<sub>best</sub> − (D/Q)·S) / (D + Q·I/2)</p>
-    <div class="actions">
-      <button type="button" id="copy-link" class="btn">คัดลอกลิงก์</button>
-      <button type="button" id="reset" class="btn btn-ghost">รีเซ็ต</button>
-    </div>
-  </header>
-
-  <div class="layout">
+  <div class="app">
     <aside class="panel" aria-labelledby="assumptions-title">
+      <div class="brand">
+        <span class="logo" aria-hidden="true">Q</span>
+        <span class="brand-name">QDM Negotiator</span>
+      </div>
       <h2 id="assumptions-title">สมมติฐาน</h2>
 
       <div class="field" data-key="D">
@@ -115,18 +104,31 @@
     </aside>
 
     <main class="dash">
-      <section class="card kpis" aria-label="ผลของข้อเสนอต่อรอง" aria-live="polite">
-        <div class="kpi-text">
+      <header class="topline">
+        <div>
+          <h1>ต่อรองราคากับร้าน</h1>
+          <p class="formula"><span>TC = D·P + (D/Q)·S + (Q/2)·I·P</span><span>Q* = √(2DS / IP)</span><span>ราคาเท่าทุน = (TC<sub>best</sub> − (D/Q)·S) / (D + Q·I/2)</span></p>
+        </div>
+        <div class="actions">
+          <button type="button" id="copy-link" class="btn">คัดลอกลิงก์</button>
+          <button type="button" id="reset" class="btn btn-ghost">รีเซ็ต</button>
+        </div>
+      </header>
+
+      <section class="kpis" aria-label="ผลของข้อเสนอต่อรอง" aria-live="polite">
+        <div class="hero">
           <div class="verdict" id="verdict"></div>
+          <dl class="hero-stats">
+            <div><dt>TC ใหม่ต่อปี</dt><dd id="out-tc"></dd><span class="meta" id="out-tc-meta"></span></div>
+            <div><dt id="out-saving-label">ประหยัดต่อปี</dt><dd id="out-saving"></dd><span class="meta" id="out-saving-meta"></span></div>
+          </dl>
           <p class="summary" id="summary"></p>
         </div>
-          <dl class="stats">
-            <div class="stat stat-main"><dt>TC ใหม่ต่อปี</dt><dd id="out-tc"></dd><span class="meta" id="out-tc-meta"></span></div>
-            <div class="stat stat-main"><dt id="out-saving-label">ประหยัดต่อปี</dt><dd id="out-saving"></dd><span class="meta" id="out-saving-meta"></span></div>
-            <div class="stat"><dt>จำนวนครั้งที่สั่ง</dt><dd id="out-orders"></dd><span class="meta" id="out-orders-meta"></span></div>
-            <div class="stat"><dt>สต็อกเฉลี่ย</dt><dd id="out-inv"></dd><span class="meta" id="out-inv-meta"></span></div>
-            <div class="stat"><dt>ราคาเท่าทุน</dt><dd id="out-be"></dd><span class="meta">ขอราคาไม่เกินนี้จึงคุ้ม</span></div>
-          </dl>
+        <dl class="stats">
+          <div class="stat"><dt>จำนวนครั้งที่สั่ง</dt><dd id="out-orders"></dd><span class="meta" id="out-orders-meta"></span></div>
+          <div class="stat"><dt>สต็อกเฉลี่ย</dt><dd id="out-inv"></dd><span class="meta" id="out-inv-meta"></span></div>
+          <div class="stat"><dt>ราคาเท่าทุน</dt><dd id="out-be"></dd><span class="meta">ขอราคาไม่เกินนี้จึงคุ้ม</span></div>
+        </dl>
       </section>
 
         <div class="charts">
@@ -151,8 +153,8 @@
           </div>
           <svg id="price-chart" class="chart" viewBox="0 0 800 360" preserveAspectRatio="xMidYMid meet"></svg>
         </section>
-
       </div>
+
       <section class="card card-table" aria-labelledby="c4-title">
         <div class="card-head">
           <span class="step">3</span>
@@ -176,6 +178,5 @@
       </section>
     </main>
   </div>
-
 </body>
 </html>

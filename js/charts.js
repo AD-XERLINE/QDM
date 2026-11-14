@@ -6,7 +6,7 @@ const M = { top: 28, right: 24, bottom: 56, left: 92 };
 let W = 800, H = 360, X0, X1, Y0, Y1;
 function fit(svg) {
   W = Math.max(280, Math.round(svg.clientWidth) || 800);
-  H = Math.max(240, Math.round(svg.clientHeight) || 360);
+  H = Math.max(200, Math.round(svg.clientHeight) || 360);
   X0 = M.left; X1 = W - M.right; Y0 = M.top; Y1 = H - M.bottom;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
 }
