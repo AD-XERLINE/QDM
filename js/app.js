@@ -143,7 +143,10 @@ function renderProposal(v) {
   saving.className = good ? 'good' : 'bad';
   $('out-saving-meta').textContent = `${fmt((Math.abs(p.saving) / best.cost.total) * 100, 2)}% ของ TC`;
   $('out-orders').textContent = `${fmt(p.ordersPerYear, 1)} ครั้ง/ปี`;
-  $('out-orders-meta').textContent = `ทุก ${fmt(p.daysBetweenOrders, 0)} วัน (ร้าน: ${fmt(params.D / best.qty, 1)} ครั้ง)`;
+  // Under a day apart, "every 0 days" says nothing: show orders per day instead.
+  const d = p.daysBetweenOrders;
+  const interval = d >= 1 ? `ทุก ${fmt(d, d < 10 ? 1 : 0)} วัน` : `วันละ ${fmt(1 / d, 1)} ครั้ง`;
+  $('out-orders-meta').textContent = `${interval} (ร้าน: ${fmt(params.D / best.qty, 1)} ครั้ง)`;
   $('out-inv').textContent = `${qty(p.avgInventory)} ชิ้น`;
   $('out-inv-meta').textContent = `ร้าน: ${qty(p.bestAvgInventory)} ชิ้น`;
   $('out-be').textContent = p.breakEven === null ? 'ไม่มีราคาที่คุ้มที่ล็อตนี้' : baht(p.breakEven, 3);
