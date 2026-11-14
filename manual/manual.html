@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>คู่มือการใช้งาน QDM Negotiator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4 landscape; margin: 12mm 14mm 13mm; }
+  :root {
+    --canvas: #e9edf5; --surface: #fff; --surface-2: #f3f5fa; --border: #dfe4ee;
+    --text: #1c2340; --muted: #66708a; --accent: #4c63f0; --accent-soft: #eaeefe;
+    --good: #0b7f70; --good-soft: #dcf5ef; --bad: #cf3f36; --bad-soft: #fde6e3;
+    --proposal: #c53ab0; --proposal-soft: #fbeaf7;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { margin: 0; font-family: "IBM Plex Sans Thai", sans-serif; color: var(--text); font-size: 10.5pt; line-height: 1.6; font-variant-numeric: tabular-nums; }
+  .page { page-break-after: always; break-after: page; }
+  .page:last-child { page-break-after: auto; }
+  h1 { font-size: 30pt; line-height: 1.15; margin: 0 0 6pt; font-weight: 700; }
+  h2 { font-size: 17pt; margin: 0 0 4pt; font-weight: 700; display: flex; align-items: center; gap: 10pt; }
+  h2 .no { display: inline-grid; place-items: center; width: 24pt; height: 24pt; border-radius: 50%; background: var(--accent); color: #fff; font-size: 11pt; }
+  h3 { font-size: 12pt; margin: 10pt 0 3pt; font-weight: 600; }
+  p { margin: 0 0 6pt; }
+  .lead { color: var(--muted); font-size: 11pt; margin-bottom: 10pt; }
+  ul, ol { margin: 0 0 6pt; padding-left: 16pt; }
+  li { margin-bottom: 2pt; }
+  b { font-weight: 600; }
+  code, .f { font-family: "IBM Plex Sans Thai", sans-serif; background: var(--surface-2); border-radius: 4pt; padding: 0 4pt; white-space: nowrap; }
+  .formula { background: var(--accent-soft); border-radius: 8pt; padding: 6pt 10pt; margin: 4pt 0 8pt; font-size: 11pt; }
+  .formula small { display: block; color: var(--muted); font-size: 9.5pt; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14pt; align-items: start; }
+  .grid-img-text { display: grid; grid-template-columns: 1.35fr 1fr; gap: 16pt; align-items: start; }
+  .grid-text-img { display: grid; grid-template-columns: 1fr 1.35fr; gap: 16pt; align-items: start; }
+  .side-img { display: grid; grid-template-columns: 150pt 1fr; gap: 16pt; align-items: start; }
+
+  figure { margin: 0 0 8pt; }
+  figure img { display: block; width: 100%; border-radius: 10pt; border: 1px solid var(--border); background: var(--canvas); }
+  figcaption { color: var(--muted); font-size: 9pt; margin-top: 3pt; }
+
+  .note { border-left: 3pt solid var(--accent); background: var(--surface-2); padding: 5pt 10pt; border-radius: 0 8pt 8pt 0; margin: 6pt 0; font-size: 10pt; }
+  .note.good { border-color: var(--good); background: var(--good-soft); }
+  .note.bad { border-color: var(--bad); background: var(--bad-soft); }
+  .note.prop { border-color: var(--proposal); background: var(--proposal-soft); }
+
+  table.t { width: 100%; border-collapse: collapse; font-size: 9.5pt; margin: 4pt 0 8pt; }
+  table.t th { text-align: left; color: var(--muted); font-weight: 500; border-bottom: 1px solid var(--border); padding: 3pt 6pt; }
+  table.t td { border-bottom: 1px solid var(--border); padding: 3pt 6pt; vertical-align: top; }
+  table.t td.n, table.t th.n { text-align: right; }
+  table.t tr.hl td { background: var(--accent-soft); font-weight: 600; }
+  table.t tr.pr td { background: var(--proposal-soft); font-weight: 600; }
+
+  .sw { display: inline-block; width: 9pt; height: 9pt; border-radius: 50%; vertical-align: -1pt; margin-right: 3pt; }
+  .line { display: inline-block; width: 22pt; height: 0; vertical-align: 3pt; margin-right: 4pt; border-top: 2.5pt solid; }
+  .line.dash { border-top-style: dashed; }
+  .line.dot { border-top-style: dotted; }
+  .dot { display: inline-block; width: 9pt; height: 9pt; border-radius: 50%; vertical-align: -1pt; margin-right: 4pt; }
+  .dot.hollow { background: #fff; border: 2pt solid; }
+  .diamond { display: inline-block; width: 9pt; height: 9pt; background: var(--proposal); transform: rotate(45deg); margin: 0 5pt 0 2pt; }
+  .pill { display: inline-block; border-radius: 999px; padding: 0 8pt; font-size: 9pt; font-weight: 500; background: var(--surface-2); }
+  .pill.good { background: var(--good-soft); color: var(--good); }
+  .pill.bad { background: var(--bad-soft); color: var(--bad); }
+  .pill.best { background: var(--accent); color: #fff; }
+
+  /* Cover */
+  .cover { display: grid; grid-template-columns: 1fr 1.25fr; gap: 24pt; align-items: center; height: 180mm; }
+  .cover .logo { display: inline-grid; place-items: center; width: 40pt; height: 40pt; border-radius: 12pt; background: var(--accent); color: #fff; font-weight: 700; font-size: 20pt; margin-bottom: 14pt; }
+  .cover .meta { margin-top: 18pt; color: var(--muted); font-size: 10pt; }
+  .cover figure img { box-shadow: 0 8pt 30pt rgb(28 35 64 / .12); }
+
+  /* Annotated overview */
+  .shot { position: relative; }
+  .shot img { display: block; width: 100%; border-radius: 10pt; border: 1px solid var(--border); }
+  .badge { position: absolute; transform: translate(-50%, -50%); width: 18pt; height: 18pt; border-radius: 50%; background: var(--text); color: #fff; font-weight: 700; font-size: 10pt; display: grid; place-items: center; border: 2pt solid #fff; box-shadow: 0 2pt 6pt rgb(0 0 0 / .25); }
+  .legend { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4pt 14pt; margin-top: 8pt; font-size: 9.5pt; }
+  .legend div { display: flex; gap: 6pt; align-items: baseline; }
+  .legend .k { flex: none; display: inline-grid; place-items: center; width: 15pt; height: 15pt; border-radius: 50%; background: var(--text); color: #fff; font-size: 8pt; font-weight: 700; }
+
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14pt; align-items: start; }
+  .overview { display: grid; grid-template-columns: minmax(0, 1fr) 215pt; gap: 14pt; align-items: start; }
+  .overview .legend { grid-template-columns: 1fr; margin-top: 0; gap: 5pt; }
+  figure.phone img { height: 470px; object-fit: cover; object-position: top; }
+  .toc { columns: 2; column-gap: 24pt; padding-left: 14pt; }
+  .toc li { break-inside: avoid; }
+  .small { font-size: 9pt; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- ============ Cover ============ -->
+<section class="page">
+  <div class="cover">
+    <div>
+      <span class="logo">Q</span>
+      <h1>คู่มือการใช้งาน<br>QDM Negotiator</h1>
+      <p class="lead">เว็บสำหรับหาข้อเสนอต่อรองราคากับผู้ขาย ด้วย EOQ และ Quantity Discount Model ปรับสมมติฐานได้ทุกตัว แล้วเห็นทันทีว่าควรขอราคาเท่าไรที่ล็อตขนาดไหน ต้นทุนรวมต่อปีจึงจะต่ำกว่าข้อเสนอที่ดีที่สุดของร้าน</p>
+      <p>คู่มือนี้อธิบายทุกส่วนของหน้าจอ ว่าแสดงอะไร เปลี่ยนเมื่อไร หมายความว่าอย่างไร และคำนวณด้วยสูตรใด โดยใช้ข้อมูลตั้งต้นของเว็บ (โจทย์ร้าน Bee Beauty) เป็นตัวอย่างตลอดทั้งเล่ม</p>
+      <p class="meta">เว็บ: https://ad-xerline.github.io/QDM/<br>หน้าจอในคู่มือถ่ายจากจอ 1536 × 864 px</p>
+    </div>
+    <figure><img src="img/overview.png" alt="หน้าจอหลักของ QDM Negotiator"></figure>
+  </div>
+</section>
+
+<!-- ============ Contents + example data ============ -->
+<section class="page">
+  <div class="grid2">
+    <div>
+      <h2>สารบัญ</h2>
+      <ol class="toc">
+        <li>ข้อมูลตัวอย่างและสัญลักษณ์</li>
+        <li>หน้าจอหลัก 9 ส่วน</li>
+        <li>สมมติฐาน D, S, I</li>
+        <li>ตารางส่วนลดของร้าน</li>
+        <li>เมื่อกรอกข้อมูลผิด</li>
+        <li>ข้อเสนอต่อรอง</li>
+        <li>การ์ดผลลัพธ์</li>
+        <li>ผลลัพธ์ในกรณีพิเศษ</li>
+        <li>กราฟ 1: TC ตามขนาดล็อต</li>
+        <li>กราฟ 1 ในสถานการณ์อื่น</li>
+        <li>กราฟ 2: ราคาเท่าทุน</li>
+        <li>ตารางเปรียบเทียบ</li>
+        <li>สถานะของแต่ละช่วงราคา</li>
+        <li>ตัวอย่างคำนวณทีละขั้น</li>
+        <li>ปุ่มด้านบนและลิงก์</li>
+        <li>ขนาดจอ</li>
+        <li>ขั้นตอนใช้งานจริง และการแก้ปัญหา</li>
+      </ol>
+
+      <h3>เว็บนี้ตอบคำถามอะไร</h3>
+      <p>ร้านมักให้ส่วนลดเมื่อสั่งครั้งละมาก ๆ แต่ล็อตใหญ่ทำให้ต้องเก็บสต็อกนานและเสียค่าเก็บรักษา เว็บนี้ตอบว่า</p>
+      <ol>
+        <li>ในตารางราคาของร้าน ทางเลือกใดถูกที่สุดทั้งปี (TC ต่ำสุด)</li>
+        <li>ถ้าจะต่อรองให้ร้านให้ราคาส่วนลดโดยสั่งล็อตเล็กลง ต้องได้ราคาไม่เกินเท่าไร จึงยังคุ้มกว่าข้อเสนอเดิม</li>
+        <li>ข้อเสนอที่จะยื่น ประหยัดหรือแพงขึ้นกี่บาทต่อปี</li>
+      </ol>
+    </div>
+    <div>
+      <h2><span class="no">1</span>ข้อมูลตัวอย่างและสัญลักษณ์</h2>
+      <p>เมื่อเปิดเว็บครั้งแรก หรือกด <b>รีเซ็ต</b> เว็บจะใช้โจทย์ร้าน Bee Beauty นี้</p>
+      <table class="t">
+        <tr><th>ค่า</th><th>ความหมาย</th><th class="n">ค่าตั้งต้น</th></tr>
+        <tr><td><b>D</b></td><td>ความต้องการต่อปี</td><td class="n">5,000 ชิ้น/ปี</td></tr>
+        <tr><td><b>S</b></td><td>ค่าใช้จ่ายในการสั่งซื้อแต่ละครั้ง</td><td class="n">฿49/ครั้ง</td></tr>
+        <tr><td><b>I</b></td><td>อัตราค่าเก็บรักษา เป็น % ของราคาต่อปี</td><td class="n">20%</td></tr>
+      </table>
+      <table class="t">
+        <tr><th>ช่วง</th><th>สั่งตั้งแต่</th><th>ถึง</th><th class="n">ราคา/ชิ้น</th></tr>
+        <tr><td><span class="sw" style="background:#2f6fe4"></span>1</td><td>0</td><td>999</td><td class="n">฿5.00</td></tr>
+        <tr><td><span class="sw" style="background:#e0483e"></span>2</td><td>1,000</td><td>1,999</td><td class="n">฿4.80</td></tr>
+        <tr><td><span class="sw" style="background:#0f9f8c"></span>3</td><td>2,000</td><td>ขึ้นไป</td><td class="n">฿4.75</td></tr>
+      </table>
+      <h3>สัญลักษณ์ที่ใช้ทั้งเล่ม</h3>
+      <table class="t">
+        <tr><td><b>P</b></td><td>ราคาต่อชิ้น</td><td><b>Q</b></td><td>ขนาดล็อต (ชิ้นต่อครั้ง)</td></tr>
+        <tr><td><b>H</b></td><td>ค่าเก็บรักษาต่อชิ้นต่อปี = I × P</td><td><b>Q*</b></td><td>EOQ ของราคานั้น</td></tr>
+        <tr><td><b>TC</b></td><td>ต้นทุนรวมต่อปี</td><td><b>TC<sub>best</sub></b></td><td>TC ต่ำสุดในตารางของร้าน</td></tr>
+        <tr><td><b>Qn, Pn</b></td><td>ล็อตและราคาที่เราขอ</td><td><b>P<sub>be</sub></b></td><td>ราคาเท่าทุน</td></tr>
+      </table>
+      <div class="formula">TC(Q, P) = D·P + (D/Q)·S + (Q/2)·I·P
+        <small>ค่าสินค้าทั้งปี + ค่าสั่งซื้อทั้งปี + ค่าเก็บรักษาทั้งปี</small></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Overview ============ -->
+<section class="page">
+  <h2><span class="no">2</span>หน้าจอหลัก 9 ส่วน</h2>
+  <p class="lead">บนจอคอมพิวเตอร์ที่กว้างตั้งแต่ 1200 px และสูงตั้งแต่ 680 px ทุกส่วนอยู่ในจอเดียว ไม่ต้องเลื่อนหน้า ด้านซ้ายใช้ปรับค่า ด้านขวาแสดงผล ทุกครั้งที่ปรับค่า ผลทั้งหน้าคำนวณใหม่ทันที</p>
+  <div class="overview">
+  <div class="shot">
+    <img src="img/overview.png" alt="">
+    <span class="badge" style="left:17.6%;top:11.5%">1</span>
+    <span class="badge" style="left:17.6%;top:34.5%">2</span>
+    <span class="badge" style="left:17.6%;top:59.5%">3</span>
+    <span class="badge" style="left:84.8%;top:4.5%">4</span>
+    <span class="badge" style="left:52.6%;top:10.8%">5</span>
+    <span class="badge" style="left:98%;top:10.8%">6</span>
+    <span class="badge" style="left:58.5%;top:30%">7</span>
+    <span class="badge" style="left:98%;top:30%">8</span>
+    <span class="badge" style="left:98%;top:72%">9</span>
+  </div>
+  <div class="legend">
+    <div><span class="k">1</span><span><b>สมมติฐาน D, S, I</b> ปรับด้วย slider หรือพิมพ์ตัวเลข (หัวข้อ 3)</span></div>
+    <div><span class="k">2</span><span><b>ตารางส่วนลดของร้าน</b> 1–6 ช่วงราคา (หัวข้อ 4)</span></div>
+    <div><span class="k">3</span><span><b>ข้อเสนอต่อรอง</b> ล็อตและราคาที่จะขอ (หัวข้อ 6)</span></div>
+    <div><span class="k">4</span><span><b>คัดลอกลิงก์ / รีเซ็ต</b> (หัวข้อ 15)</span></div>
+    <div><span class="k">5</span><span><b>การ์ดผลลัพธ์หลัก</b> สีเขียวหรือแดงตามผล (หัวข้อ 7)</span></div>
+    <div><span class="k">6</span><span><b>ตัวชี้วัดรอง</b> ความถี่สั่ง สต็อก ราคาเท่าทุน (หัวข้อ 7)</span></div>
+    <div><span class="k">7</span><span><b>กราฟ 1</b> TC ของทุกช่วงราคา และของข้อเสนอ (หัวข้อ 9–10)</span></div>
+    <div><span class="k">8</span><span><b>กราฟ 2</b> ราคาเท่าทุนในแต่ละขนาดล็อต (หัวข้อ 11)</span></div>
+    <div><span class="k">9</span><span><b>ตารางเปรียบเทียบ</b> ตัวเลขทุกทางเลือก (หัวข้อ 12–13)</span></div>
+  </div>
+  </div>
+  <p class="small" style="margin-top:8pt">ใต้หัวเว็บมีสูตร 3 สูตรที่เว็บใช้: TC, Q* และราคาเท่าทุน (บนจอที่สูงไม่ถึง 860 px สูตรนี้จะถูกซ่อนเพื่อเว้นที่ให้กราฟ)</p>
+</section>
+
+<!-- ============ Assumptions ============ -->
+<section class="page">
+  <div class="side-img">
+    <figure><img src="img/sidebar.png" alt=""><figcaption>แถบด้านข้างทั้งแถบ</figcaption></figure>
+    <div>
+      <h2><span class="no">3</span>สมมติฐาน D, S, I</h2>
+      <p class="lead">สามค่านี้ใช้กับทุกช่วงราคาและกับข้อเสนอต่อรอง แต่ละค่ามีสองช่องที่ผูกกัน: slider สำหรับลากเร็ว ๆ และช่องตัวเลขสำหรับพิมพ์ค่าที่แน่นอน</p>
+      <table class="t">
+        <tr><th>ค่า</th><th>หน่วย</th><th>ช่วงของ slider</th><th>ช่องตัวเลขรับ</th><th>ผลเมื่อค่าเพิ่มขึ้น</th></tr>
+        <tr><td><b>D</b></td><td>ชิ้น/ปี</td><td>100 – 20,000 (ทีละ 50)</td><td>ตัวเลขใด ๆ ที่ &gt; 0</td><td>Q* ทุกช่วงใหญ่ขึ้น ค่าสินค้าทั้งปีเพิ่ม</td></tr>
+        <tr><td><b>S</b></td><td>฿/ครั้ง</td><td>1 – 500</td><td>ตัวเลขใด ๆ ที่ &gt; 0</td><td>สั่งน้อยครั้งลงจึงคุ้ม Q* ใหญ่ขึ้น</td></tr>
+        <tr><td><b>I</b></td><td>% ของราคา/ปี</td><td>1 – 50 (ทีละ 0.5)</td><td>ตัวเลขใด ๆ ที่ &gt; 0</td><td>เก็บของแพงขึ้น Q* เล็กลง ล็อตใหญ่เสียเปรียบ</td></tr>
+      </table>
+      <div class="note">ช่องตัวเลขรับค่านอกช่วงของ slider ได้ เช่น D = 50,000 เมื่อพิมพ์ค่าที่เกินช่วง slider จะไปค้างที่ปลายสุด แต่การคำนวณใช้ค่าที่พิมพ์</div>
+      <h3>I กับ H ต่างกันอย่างไร</h3>
+      <p>เว็บรับ I เป็นเปอร์เซ็นต์ ไม่ได้รับ H เป็นบาท เพราะค่าเก็บรักษาของสินค้าราคาถูกกว่าก็ถูกกว่าด้วย ข้อความใต้ตารางส่วนลดจึงเตือนว่า <b>H = I × ราคา จึงต่างกันในแต่ละช่วงราคา</b></p>
+      <div class="formula">ตัวอย่าง: I = 20%<br>ช่วง 1 (฿5.00): H = 0.20 × 5.00 = ฿1.00/ชิ้น/ปี<br>ช่วง 2 (฿4.80): H = 0.20 × 4.80 = ฿0.96/ชิ้น/ปี<br>ช่วง 3 (฿4.75): H = 0.20 × 4.75 = ฿0.95/ชิ้น/ปี</div>
+      <h3>สิ่งที่เปลี่ยนเมื่อปรับ D, S หรือ I</h3>
+      <ul>
+        <li>Q* ของทุกช่วงคำนวณใหม่ จึงอาจเปลี่ยนว่าช่วงใดดีที่สุด</li>
+        <li>TC<sub>best</sub>, เส้นราคาเท่าทุน, ตัวเลขผลลัพธ์, กราฟทั้งสอง และตารางเปลี่ยนตาม</li>
+        <li>ถ้ายังไม่ได้ปรับข้อเสนอต่อรองเอง ล็อตและราคาที่ขอจะเปลี่ยนตามค่าแนะนำใหม่ด้วย (หัวข้อ 6)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Tiers + errors ============ -->
+<section class="page">
+  <div class="side-img">
+    <figure><img src="img/errors.png" alt=""><figcaption>ตัวอย่างข้อมูลผิด 2 จุด: D ว่าง และช่วง 2 เริ่มที่ 0</figcaption></figure>
+    <div>
+      <h2><span class="no">4</span>ตารางส่วนลดของร้าน</h2>
+      <p>แต่ละแถวคือหนึ่งช่วงราคา กรอก <b>สั่งตั้งแต่ (ชิ้น)</b> และ <b>ราคา (฿)</b> ต่อชิ้น ขอบบนของแต่ละช่วงคำนวณให้เองจากช่วงถัดไป ลบ 1 ช่วงสุดท้ายไม่มีขอบบน</p>
+      <ul>
+        <li><b>+ เพิ่มช่วง</b> เพิ่มแถวต่อท้าย ได้สูงสุด 6 ช่วง ครบ 6 ช่วงแล้วปุ่มจะกดไม่ได้</li>
+        <li><b>✕</b> ลบช่วงนั้น ช่วงแรกลบไม่ได้ เพราะต้องมีอย่างน้อย 1 ช่วง</li>
+        <li>จุดสีหน้าเลขช่วงคือสีของช่วงนั้นในกราฟ 1, กราฟ 2 และตาราง</li>
+      </ul>
+      <h2 style="margin-top:12pt"><span class="no">5</span>เมื่อกรอกข้อมูลผิด</h2>
+      <p>ช่องที่ผิดจะเป็นกรอบแดง พร้อมข้อความบอกวิธีแก้ใต้ช่อง ระหว่างที่ยังมีช่องผิด <b>ผลลัพธ์ กราฟ และตารางจะค้างค่าล่าสุดที่ถูกต้องไว้</b> ไม่แสดง NaN หรือตัวเลขแปลก ๆ แก้ครบเมื่อไร ทุกอย่างคำนวณใหม่ทันที</p>
+      <table class="t">
+        <tr><th>ช่อง</th><th>เงื่อนไข</th><th>ข้อความที่ขึ้น</th></tr>
+        <tr><td>D, S, I, ราคาที่ขอ</td><td>ตัวเลขมากกว่า 0</td><td>ต้องเป็นตัวเลขที่มากกว่า 0</td></tr>
+        <tr><td>ล็อตที่ขอ</td><td>จำนวนเต็มตั้งแต่ 1</td><td>ต้องเป็นจำนวนเต็มตั้งแต่ 1</td></tr>
+        <tr><td>ช่วงแรก สั่งตั้งแต่</td><td>ต้องเป็น 0</td><td>ช่วงแรกต้องเริ่มที่ 0</td></tr>
+        <tr><td>ช่วงถัดไป สั่งตั้งแต่</td><td>จำนวนเต็ม ≥ 0</td><td>ต้องเป็นจำนวนเต็มไม่ติดลบ</td></tr>
+        <tr><td></td><td>มากกว่าช่วงก่อนหน้า</td><td>ต้องมากกว่าปริมาณขั้นต่ำของช่วงก่อนหน้า</td></tr>
+        <tr><td>ราคาในตาราง</td><td>ตัวเลขมากกว่า 0</td><td>ต้องเป็นตัวเลขที่มากกว่า 0</td></tr>
+      </table>
+      <div class="note">ระหว่างพิมพ์ เช่น ลบค่าเดิมทิ้งก่อนพิมพ์ใหม่ กรอบแดงจะขึ้นชั่วคราว นี่เป็นเรื่องปกติ พิมพ์ต่อจนเสร็จกรอบแดงก็หายไป</div>
+      <div class="note">ราคาของช่วงหลังไม่จำเป็นต้องถูกกว่าช่วงก่อน ถ้าร้านคิดราคาล็อตใหญ่แพงกว่า เว็บก็ยังเลือกทางเลือกที่ TC ต่ำสุดได้ถูกต้อง (ดูสถานะ "ปรับลง" ในหัวข้อ 13)</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Proposal ============ -->
+<section class="page">
+  <div class="grid-text-img">
+    <div>
+      <h2><span class="no">6</span>ข้อเสนอต่อรอง</h2>
+      <p class="lead">กล่องสีชมพูในแถบด้านข้างคือข้อเสนอที่เราจะยื่นให้ร้าน สีชมพูม่วงนี้ใช้กับข้อเสนอต่อรองทุกที่ในหน้า: จุด ◆ บนกราฟ เส้นประบนกราฟ 1 และแถวสุดท้ายของตาราง</p>
+      <table class="t">
+        <tr><th>ช่อง</th><th>ความหมาย</th><th>ช่วงของ slider</th></tr>
+        <tr><td><b>ล็อตที่ขอ</b> (Qn)</td><td>สั่งครั้งละกี่ชิ้น</td><td>1 ถึงขอบขวาของกราฟ (ยืดตามช่วงสุดท้ายของร้านและล็อตที่ขอ)</td></tr>
+        <tr><td><b>ราคาที่ขอ</b> (Pn)</td><td>ราคาต่อชิ้นที่ขอ</td><td>80% ของราคาต่ำสุดในตาราง ถึงราคาสูงสุดในตาราง</td></tr>
+      </table>
+      <h3>ปรับข้อเสนอได้ 3 วิธี</h3>
+      <ol>
+        <li>ลาก slider</li>
+        <li>พิมพ์ตัวเลขในช่อง</li>
+        <li>ลากจุด <span class="diamond"></span> บนกราฟ 1 ไปซ้ายหรือขวาเพื่อเปลี่ยนล็อต ระหว่างลาก แกนนอนจะหยุดนิ่งไว้ จุดจึงไม่วิ่งหนีเมาส์ ปล่อยแล้วแกนจะปรับใหม่ วิธีนี้ใช้นิ้วลากบนจอสัมผัสได้ด้วย</li>
+      </ol>
+      <h3>ปุ่ม "ใช้ค่าแนะนำ"</h3>
+      <p>ค่าแนะนำคือ <b>ขอราคาเท่ากับราคาที่ดีที่สุดของร้าน แต่สั่งที่ EOQ ของราคานั้น</b> แทนที่จะสั่งตามขั้นต่ำของร้าน</p>
+      <div class="formula">Pn = ราคาของช่วงที่ดีที่สุด = ฿4.80<br>Qn = Q*(4.80) = √(2 × 5,000 × 49 / (0.20 × 4.80)) = 714.4 → 714 ชิ้น</div>
+    </div>
+    <div>
+      <figure style="max-width:250pt"><img src="img/proposal.png" alt=""><figcaption>กล่องข้อเสนอต่อรอง ค่าตั้งต้นคือ 714 ชิ้น ที่ ฿4.80</figcaption></figure>
+      <h3>ทำไมค่าแนะนำจึงประหยัด</h3>
+      <p>ร้านให้ ฿4.80 ต่อเมื่อสั่งครั้งละอย่างน้อย 1,000 ชิ้น แต่ที่ราคานี้ EOQ คือ 714 ชิ้น การสั่ง 1,000 ชิ้นจึงทำให้ค่าเก็บรักษาสูงเกินจำเป็น ถ้าร้านยอมให้ราคาเดิมที่ล็อต 714 ชิ้น โดยเรายืนยันยอดซื้อรวมทั้งปีเท่าเดิม (5,000 ชิ้น) TC จะลดลง ร้านไม่เสียยอดขาย เราได้สต็อกที่เบาลง</p>
+      <table class="t">
+        <tr><th></th><th class="n">ร้าน (1,000 ชิ้น)</th><th class="n">ขอ (714 ชิ้น)</th></tr>
+        <tr><td>ค่าสินค้า</td><td class="n">฿24,000.00</td><td class="n">฿24,000.00</td></tr>
+        <tr><td>ค่าสั่งซื้อ</td><td class="n">฿245.00</td><td class="n">฿343.14</td></tr>
+        <tr><td>ค่าเก็บรักษา</td><td class="n">฿480.00</td><td class="n">฿342.72</td></tr>
+        <tr class="hl"><td>TC</td><td class="n">฿24,725.00</td><td class="n">฿24,685.86</td></tr>
+      </table>
+      <div class="note prop">เมื่อเปิดเว็บ ข้อเสนอต่อรองจะเป็นค่าแนะนำ และเปลี่ยนตามทุกครั้งที่ปรับ D, S, I หรือตาราง แต่เมื่อคุณปรับล็อตหรือราคาที่ขอเองแล้ว <b>ค่าทั้งสองจะถูกตรึงไว้</b> การปรับสมมติฐานภายหลังจะไม่ย้ายข้อเสนอ กด "ใช้ค่าแนะนำ" เพื่อกลับไปใช้ค่าแนะนำ</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ KPIs ============ -->
+<section class="page">
+  <h2><span class="no">7</span>การ์ดผลลัพธ์</h2>
+  <p class="lead">แถบผลลัพธ์บอกว่าข้อเสนอต่อรองคุ้มกว่าข้อเสนอที่ดีที่สุดของร้านหรือไม่ การ์ดใหญ่ทางซ้ายเปลี่ยนสีตามผล ถ้าคุ้มเป็นสีเขียว ถ้าแพงกว่าเป็นสีแดงอมส้ม ความสูงของแถบคงที่ เมื่อผลสลับไปมา กราฟด้านล่างจึงไม่ขยับ</p>
+  <div class="grid2">
+    <figure><img src="img/hero-good.png" alt=""><figcaption>714 ชิ้น ที่ ฿4.80: ได้ประโยชน์ (สีเขียว)</figcaption></figure>
+    <figure><img src="img/hero-bad.png" alt=""><figcaption>1,400 ชิ้น ที่ ฿4.80: แพงกว่าร้าน (สีแดงอมส้ม)</figcaption></figure>
+  </div>
+  <table class="t">
+    <tr><th style="width:17%">ช่อง</th><th style="width:43%">วิธีคำนวณ</th><th>ตัวอย่าง (714 ชิ้น ที่ ฿4.80)</th></tr>
+    <tr><td>ป้ายผล</td><td>✓ ได้ประโยชน์ เมื่อ TC ใหม่ ≤ TC<sub>best</sub> ไม่อย่างนั้นขึ้น ✗ แพงกว่า</td><td>24,685.86 ≤ 24,725.00 → ✓ ได้ประโยชน์</td></tr>
+    <tr><td>TC ใหม่ต่อปี</td><td>D·Pn + (D/Qn)·S + (Qn/2)·I·Pn ใต้ตัวเลขแสดง TC ของร้านไว้เทียบ</td><td>24,000 + 343.14 + 342.72 = ฿24,686</td></tr>
+    <tr><td>ประหยัดต่อปี / แพงขึ้นต่อปี</td><td>TC<sub>best</sub> − TC ใหม่ ถ้าติดลบ หัวข้อเปลี่ยนเป็น "แพงขึ้นต่อปี" และแสดงเป็นบวก ใต้ตัวเลขเป็น % ของ TC<sub>best</sub></td><td>24,725.00 − 24,685.86 = ฿39 (0.16% ของ TC)</td></tr>
+    <tr><td>สรุป</td><td>ประโยคเดียวที่บอกทั้งข้อเสนอ ผล และเงื่อนไข ใช้อ่านให้ร้านฟังได้</td><td>ขอราคา ฿4.80 ที่ล็อต 714 ชิ้น โดยสัญญาซื้อรวม 5,000 ชิ้น/ปี …</td></tr>
+    <tr><td>จำนวนครั้งที่สั่ง</td><td>D / Qn ครั้งต่อปี ทุก 365·Qn/D วัน วงเล็บเป็นของร้าน (D / Q ของช่วงที่ดีที่สุด)</td><td>5,000 / 714 = 7.0 ครั้ง/ปี ทุก 52 วัน (ร้าน: 5.0 ครั้ง)</td></tr>
+    <tr><td>สต็อกเฉลี่ย</td><td>Qn / 2 เทียบกับ Q / 2 ของร้าน</td><td>714 / 2 = 357 ชิ้น (ร้าน: 500 ชิ้น)</td></tr>
+    <tr><td>ราคาเท่าทุน</td><td>ราคาสูงสุดที่ขอได้ที่ล็อต Qn โดย TC ไม่เกิน TC<sub>best</sub> (สูตรในหัวข้อ 11)</td><td>฿4.808: ขอ ฿4.80 ได้ เพราะต่ำกว่า ฿4.808</td></tr>
+  </table>
+  <div class="note">จอที่สูงไม่ถึง 980 px จะซ่อนบรรทัดเล็กใต้ TC ใหม่และใต้ยอดประหยัด จอที่สูงไม่ถึง 860 px จะซ่อนบรรทัดเล็กใต้ตัวชี้วัดรองทั้งสามด้วย เพื่อเว้นที่ให้กราฟ ค่าเหล่านี้ยังดูได้ในตารางเปรียบเทียบ</div>
+</section>
+
+<!-- ============ KPI special cases ============ -->
+<section class="page">
+  <h2><span class="no">8</span>ผลลัพธ์ในกรณีพิเศษ</h2>
+  <div class="grid2">
+    <div>
+      <figure><img src="img/hero-lowprice.png" alt=""><figcaption>714 ชิ้น ที่ ฿4.70: ขอราคาต่ำกว่าที่ร้านมี</figcaption></figure>
+      <h3>ขอราคาต่ำกว่าราคาในตาราง</h3>
+      <p>ราคาที่ขอเลื่อนลงได้ถึง 80% ของราคาต่ำสุดในตาราง ราคาที่ต่ำลงทำให้ค่าสินค้าทั้งปีลดลงมาก ยอดประหยัดจึงสูงกว่ากรณีที่ขอแค่ล็อตเล็กลงหลายเท่า</p>
+      <div class="formula">TC = 5,000 × 4.70 + 343.14 + (714/2)(0.20)(4.70)<br>= 23,500 + 343.14 + 335.58 = ฿24,178.72<br>ประหยัด = 24,725.00 − 24,178.72 = ฿546</div>
+      <p class="small">การเลือกราคาที่ร้านจะยอมรับเป็นเรื่องการเจรจา เว็บบอกได้เพียงว่าราคานั้นคุ้มกับเราหรือไม่</p>
+    </div>
+    <div>
+      <figure><img src="img/stats-nobe.png" alt=""><figcaption>5 ชิ้น ที่ ฿4.80: ช่องราคาเท่าทุนขึ้น "ไม่มีราคาที่คุ้มที่ล็อตนี้"</figcaption></figure>
+      <h3>"ไม่มีราคาที่คุ้มที่ล็อตนี้"</h3>
+      <p>เมื่อล็อตเล็กมาก ต้องสั่งบ่อยจนค่าสั่งซื้อทั้งปีอย่างเดียวก็เกิน TC<sub>best</sub> แล้ว ต่อให้ได้ของฟรี TC ก็ยังแพงกว่าร้าน ราคาเท่าทุนจึงติดลบ เว็บจะไม่แสดงราคาติดลบ แต่ขึ้นข้อความนี้แทน</p>
+      <div class="formula">ค่าสั่งซื้อที่ 5 ชิ้น = (5,000 / 5) × 49 = ฿49,000/ปี &gt; TC<sub>best</sub> ฿24,725<br>P<sub>be</sub> = (24,725 − 49,000) / (5,000 + 0.5) = −4.85 → ไม่มีราคาที่คุ้ม</div>
+      <div class="note bad">ล็อตเล็กลงไม่ได้ช่วยเสมอไป ค่าสั่งซื้อเพิ่มขึ้นตามจำนวนครั้งที่สั่ง ล็อตที่คุ้มที่สุดอยู่ใกล้ Q* เสมอ</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Chart 1 ============ -->
+<section class="page">
+  <div class="grid-img-text">
+    <div>
+      <figure><img src="img/chart1-good.png" alt=""><figcaption>กราฟ 1 ที่ค่าตั้งต้น ข้อเสนอ 714 ชิ้น ที่ ฿4.80</figcaption></figure>
+      <h3>อ่านกราฟนี้อย่างไร</h3>
+      <p>แกนนอนคือขนาดล็อต Q แกนตั้งคือ TC ต่อปี แต่ละเส้นคือ TC ถ้าซื้อที่ราคาของช่วงนั้นด้วยล็อตขนาดต่าง ๆ รูปตัว U มาจากค่าสั่งซื้อที่ลดลงเมื่อล็อตใหญ่ขึ้น บวกค่าเก็บรักษาที่เพิ่มขึ้นตามล็อต ก้นตัว U คือ Q*</p>
+      <p>หัวการ์ดบอกข้อเสนอที่ดีที่สุดของร้านเป็นประโยค เช่น "ดีที่สุดคือสั่งครั้งละ 1,000 ชิ้นที่ ฿4.80: TC ฿24,725.00/ปี"</p>
+    </div>
+    <div>
+      <h2><span class="no">9</span>กราฟ 1: TC ตามขนาดล็อต</h2>
+      <table class="t">
+        <tr><th style="width:34%">สิ่งที่เห็น</th><th>ความหมาย</th></tr>
+        <tr><td><span class="line" style="color:#2f6fe4"></span>เส้นทึบสีของช่วง</td><td>TC ของช่วงนั้น ในช่วงล็อตที่ร้านให้ราคานี้จริง</td></tr>
+        <tr><td><span class="line dash" style="color:#9db6f2"></span>เส้นประจาง</td><td>เส้นเดียวกัน แต่อยู่นอกช่วงล็อตของราคานั้น ซื้อจริงไม่ได้ แสดงไว้ให้เห็นรูปตัว U ทั้งเส้น</td></tr>
+        <tr><td><span class="dot" style="background:#2f6fe4"></span>จุดทึบ</td><td>ล็อตที่ใช้คิด TC ของช่วงนั้น</td></tr>
+        <tr><td><span class="dot" style="background:#e0483e;width:13pt;height:13pt"></span>จุดทึบใหญ่ + ป้าย</td><td>ข้อเสนอที่ดีที่สุดของร้าน เช่น "ดีที่สุดของร้าน: 1,000 @ ฿4.80"</td></tr>
+        <tr><td><span class="dot hollow" style="color:#0f9f8c"></span>วงกลมกลวง</td><td>Q* ที่ซื้อจริงไม่ได้ เพราะอยู่นอกช่วงล็อต จึงต้องเลื่อนไปขอบของช่วง</td></tr>
+        <tr><td><span class="line dash" style="color:#1c2340"></span>เส้นประแนวนอน</td><td>"TC ที่ดีที่สุดของร้าน" (TC<sub>best</sub>) ข้อเสนอที่อยู่ต่ำกว่าเส้นนี้คือคุ้ม</td></tr>
+        <tr><td><span class="line dash" style="color:#9aa3b5;border-top-width:1pt"></span>เส้นประแนวตั้ง</td><td>จุดเปลี่ยนช่วงราคา (1,000 และ 2,000 ชิ้น)</td></tr>
+        <tr><td><span class="line dot" style="color:#c53ab0"></span>เส้นจุดสีชมพูม่วง</td><td>TC ที่ราคาที่ขอ ทุกขนาดล็อต เลื่อนราคาที่ขอลง เส้นจะลงทั้งเส้น</td></tr>
+        <tr><td><span class="diamond"></span>จุด ◆ "ข้อเสนอต่อรอง (ลากได้)"</td><td>ข้อเสนอที่ล็อตที่ขอ อยู่บนเส้นจุดสีชมพูม่วงเสมอ ลากซ้ายขวาได้</td></tr>
+      </table>
+      <div class="note good">◆ อยู่ <b>ต่ำกว่า</b> เส้นประแนวนอน = ได้ประโยชน์ ◆ อยู่ <b>สูงกว่า</b> = แพงกว่าร้าน</div>
+      <h3>แกนตั้งปรับตัวอย่างไร</h3>
+      <p>ขอบเขตแกนตั้งคำนวณจากข้อเสนอของร้าน ไม่ได้คำนวณจากข้อเสนอต่อรอง เวลาเลื่อนล็อต จุด ◆ จึงขยับให้เห็นจริง แกนยืดเฉพาะเมื่อ ◆ กำลังจะหลุดกรอบ เช่น ล็อตเล็กมาก</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Chart 1 other states ============ -->
+<section class="page">
+  <h2><span class="no">10</span>กราฟ 1 ในสถานการณ์อื่น</h2>
+  <div class="grid3">
+    <div>
+      <figure><img src="img/chart1-bad.png" alt=""><figcaption>1,400 ชิ้น ที่ ฿4.80: ◆ อยู่เหนือเส้น TC ที่ดีที่สุดของร้าน</figcaption></figure>
+      <p>ราคาเท่ากับร้าน แต่ล็อต 1,400 ชิ้นอยู่ไกลจาก Q* (714) ทางขวา ค่าเก็บรักษาจึงสูงจนแพงกว่าร้าน ◆ ลอยอยู่เหนือเส้นประ ต่อให้ล็อตอยู่ในช่วงราคา 1,000–1,999 ก็ไม่ช่วย</p>
+    </div>
+    <div>
+      <figure><img src="img/chart1-onetier.png" alt=""><figcaption>ร้านมีราคาเดียว ฿5.00, I = 11%, ข้อเสนอ 1,100 ชิ้น</figcaption></figure>
+      <p>เมื่อร้านมีราคาเดียว ข้อเสนอที่ดีที่สุดของร้านคือ EOQ (944 ชิ้น) ขอราคาเดิมที่ล็อตอื่นจะแพงกว่าเสมอ ◆ จึงอยู่บนตัว U เหนือเส้นประ วิธีเดียวที่จะคุ้มคือขอราคาที่ต่ำกว่า ฿5.00</p>
+    </div>
+    <div>
+      <figure><img src="img/chart1-statuses.png" alt=""><figcaption>ตาราง 0:฿5.00, 500:฿4.90, 1,000:฿4.80 มีครบทั้ง 3 สถานะ</figcaption></figure>
+      <h3>จุดของแต่ละช่วงอยู่ที่ไหน</h3>
+      <ul>
+        <li><span class="sw" style="background:#2f6fe4"></span><b>ช่วง 1</b> Q* = 700 แต่ช่วงนี้ถึงแค่ 499 จุดทึบจึงอยู่ที่ 499 (ปรับลง) และมีวงกลมกลวงที่ 700</li>
+        <li><span class="sw" style="background:#e0483e"></span><b>ช่วง 2</b> Q* = 707 อยู่ในช่วง 500–999 จุดทึบอยู่ที่ก้นตัว U พอดี (ใช้ได้)</li>
+        <li><span class="sw" style="background:#0f9f8c"></span><b>ช่วง 3</b> Q* = 714 ต่ำกว่าขั้นต่ำ 1,000 จุดทึบจึงเลื่อนไปที่ 1,000 (ปรับขึ้น) และมีวงกลมกลวงที่ 714</li>
+      </ul>
+      <p>จุดที่ต่ำที่สุดในบรรดาจุดทึบคือข้อเสนอที่ดีที่สุดของร้าน ในตัวอย่างนี้คือช่วง 3 ที่ 1,000 ชิ้น TC ฿24,725</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Chart 2 ============ -->
+<section class="page">
+  <div class="grid2" style="grid-template-columns: 0.85fr 1fr">
+    <div>
+      <figure><img src="img/chart2-good.png" alt=""><figcaption>714 ชิ้น ที่ ฿4.80: ◆ อยู่ในโซนสีเขียว</figcaption></figure>
+      <figure><img src="img/chart2-bad.png" alt=""><figcaption>1,400 ชิ้น ที่ ฿4.80: ◆ อยู่เหนือเส้นสีเขียว</figcaption></figure>
+    </div>
+    <div>
+      <h2><span class="no">11</span>กราฟ 2: ราคาเท่าทุน</h2>
+      <p class="lead">กราฟนี้ตอบว่า "ถ้าจะสั่งครั้งละ Q ชิ้น ต้องได้ราคาไม่เกินเท่าไร จึงไม่แย่กว่าข้อเสนอที่ดีที่สุดของร้าน"</p>
+      <table class="t">
+        <tr><th style="width:34%">สิ่งที่เห็น</th><th>ความหมาย</th></tr>
+        <tr><td><span class="line" style="color:#1c2340"></span>เส้นขั้นบันได "ราคาของร้าน"</td><td>ราคาที่ร้านตั้งไว้ในแต่ละช่วงล็อต แต่ละขั้นมีแถบสีของช่วงนั้น</td></tr>
+        <tr><td><span class="line" style="color:#0b7f70"></span>เส้น "ราคาเท่าทุน"</td><td>P<sub>be</sub>(Q) ราคาสูงสุดที่ขอได้ที่ล็อต Q</td></tr>
+        <tr><td><span class="sw" style="background:#dcf5ef;border-radius:2pt"></span>พื้นสีเขียว</td><td>"ต่อรองได้ในโซนนี้ เราได้ประโยชน์" ทุกจุดใต้เส้นเขียวให้ TC ต่ำกว่าร้าน</td></tr>
+        <tr><td><span class="dot" style="background:#e0483e"></span>จุดของร้าน</td><td>ข้อเสนอที่ดีที่สุดของร้าน อยู่บนเส้นเขียวพอดี เพราะ TC เท่ากับ TC<sub>best</sub> ตามนิยาม</td></tr>
+        <tr><td><span class="diamond"></span>◆ + ป้าย</td><td>ข้อเสนอต่อรอง (Qn, Pn) ป้ายบอก ✓ ได้ประโยชน์ หรือ ✗ แพงกว่าเดิม</td></tr>
+      </table>
+      <div class="formula">P<sub>be</sub>(Q) = (TC<sub>best</sub> − (D/Q)·S) / (D + Q·I/2)
+        <small>ได้จากการแก้สมการ TC(Q, P) = TC<sub>best</sub> หา P: D·P + (Q/2)·I·P = TC<sub>best</sub> − (D/Q)·S</small></div>
+      <h3>ตัวอย่าง</h3>
+      <div class="formula">Q = 714: (24,725 − 343.14) / (5,000 + 71.4) = 24,381.86 / 5,071.4 = <b>฿4.808</b><br>Q = 1,400: (24,725 − 175) / (5,000 + 140) = 24,550 / 5,140 = <b>฿4.776</b></div>
+      <p>ราคาเท่าทุนสูงสุดอยู่ใกล้ Q* ล็อตที่ห่างจาก Q* ไม่ว่าทางซ้ายหรือขวา ต้องได้ราคาต่ำลงเรื่อย ๆ จึงจะคุ้ม เส้นเขียวจึงเป็นรูปโค้งคว่ำ ทางซ้ายสุดเส้นตกลงชันเพราะค่าสั่งซื้อพุ่งขึ้นเมื่อล็อตเล็กมาก</p>
+      <div class="note">ค่า "ราคาเท่าทุน" ในการ์ดผลลัพธ์คือความสูงของเส้นเขียวตรงล็อตที่ขอ</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Table ============ -->
+<section class="page">
+  <h2><span class="no">12</span>ตารางเปรียบเทียบ</h2>
+  <p class="lead">ทุกช่วงราคาของร้านหนึ่งแถว ปิดท้ายด้วยข้อเสนอต่อรอง ทุกช่องคำนวณด้วยสูตร TC เดียวกัน แต่ละแถวจึงเทียบกันได้ตรง ๆ</p>
+  <figure><img src="img/table-good.png" alt=""><figcaption>ตารางที่ค่าตั้งต้น</figcaption></figure>
+  <table class="t">
+    <tr><th style="width:18%">คอลัมน์</th><th>ความหมายและสูตร</th></tr>
+    <tr><td>ตัวเลือก</td><td>ช่วงราคา (จุดสีและช่วงล็อต) หรือ "ข้อเสนอต่อรอง"</td></tr>
+    <tr><td>ราคา</td><td>ราคาต่อชิ้นของช่วงนั้น หรือราคาที่ขอ</td></tr>
+    <tr><td>Q</td><td>ล็อตที่ใช้คิด ถ้าไม่ใช่ Q* จะมี (Q* …) กำกับ เช่น <code>1,000 (Q* 714)</code></td></tr>
+    <tr><td>ค่าสินค้า</td><td>D × P</td></tr>
+    <tr><td>Ordering cost</td><td>(D / Q) × S</td></tr>
+    <tr><td>Holding cost</td><td>(Q / 2) × I × P</td></tr>
+    <tr><td>TC</td><td>ผลรวมสามคอลัมน์ก่อนหน้า</td></tr>
+    <tr><td>ส่วนต่างจาก TC ที่ดีที่สุด</td><td>TC − TC<sub>best</sub>: <span class="pos" style="color:#cf3f36">+฿ สีแดง</span> แพงกว่า, <span style="color:#0b7f70">−฿ สีเขียว</span> ถูกกว่า, — คือแถวที่ดีที่สุด</td></tr>
+    <tr><td>สถานะ</td><td><span class="pill">ใช้ได้</span> <span class="pill">ปรับขึ้น</span> <span class="pill">ปรับลง</span> <span class="pill best">ดีที่สุดของร้าน</span> และในแถวข้อเสนอ <span class="pill good">✓ ได้ประโยชน์</span> หรือ <span class="pill bad">✗ แพงกว่าเดิม</span></td></tr>
+  </table>
+  <p class="small">แถวที่ดีที่สุดของร้านเป็นพื้นสีฟ้าอ่อน แถวข้อเสนอต่อรองเป็นพื้นสีชมพูอ่อน ถ้ามีหลายช่วงจนแถวล้นกรอบ ตารางจะเลื่อนดูภายในกรอบได้</p>
+</section>
+
+<!-- ============ Statuses ============ -->
+<section class="page">
+  <h2><span class="no">13</span>สถานะของแต่ละช่วงราคา</h2>
+  <p class="lead">เว็บคำนวณ Q* ของทุกช่วง (ปัดเป็นจำนวนเต็ม) แล้วตรวจว่าอยู่ในช่วงล็อตของราคานั้นหรือไม่</p>
+  <figure><img src="img/table-statuses.png" alt=""><figcaption>ตาราง 0:฿5.00, 500:฿4.90, 1,000:฿4.80 มีครบทั้งสามสถานะ</figcaption></figure>
+  <table class="t">
+    <tr><th style="width:14%">สถานะ</th><th style="width:30%">เกิดเมื่อ</th><th style="width:22%">ล็อตที่ใช้คิด TC</th><th>ตัวอย่างในภาพ</th></tr>
+    <tr><td><span class="pill">ใช้ได้</span></td><td>Q* อยู่ในช่วงล็อตของราคานั้น</td><td>Q*</td><td>ช่วง 2 (500–999): Q* = 707 → ใช้ 707</td></tr>
+    <tr><td><span class="pill">ปรับขึ้น</span></td><td>Q* ต่ำกว่าขั้นต่ำของช่วง</td><td>ขั้นต่ำของช่วง</td><td>ช่วง 3 (1,000 ขึ้นไป): Q* = 714 → ใช้ 1,000</td></tr>
+    <tr><td><span class="pill">ปรับลง</span></td><td>Q* สูงกว่าขอบบนของช่วง</td><td>ขอบบนของช่วง</td><td>ช่วง 1 (0–499): Q* = 700 → ใช้ 499</td></tr>
+  </table>
+  <div class="grid2">
+    <div>
+      <h3>"ปรับลง" ต่างจากตำราอย่างไร</h3>
+      <p>ตำรา QDM ทั่วไปจะ <b>ตัดทิ้ง</b> ช่วงที่ Q* เกินขอบบน เพราะสมมติว่าราคาลดลงเมื่อสั่งมากขึ้น ช่วงถัดไปจึงถูกกว่าเสมอ เว็บนี้ใช้วิธีคิด TC ที่ขอบบนแล้วให้ช่วงนั้นแข่งกับช่วงอื่นด้วย</p>
+      <ul>
+        <li>ถ้าราคาลดลงตามปริมาณ (เช่นโจทย์ Bee Beauty) ช่วงที่ "ปรับลง" จะไม่มีวันชนะ คำตอบจึงตรงกับตำรา</li>
+        <li>ถ้าร้านคิดราคาล็อตใหญ่แพงกว่า เช่น 0–499 ชิ้น ฿4 และ 500 ชิ้นขึ้นไป ฿5 วิธีตัดทิ้งจะเลือก ฿5 ผิด (TC ฿25,700) ส่วนเว็บนี้เลือก 499 ชิ้นที่ ฿4 ได้ถูกต้อง (TC ฿20,690.58)</li>
+      </ul>
+    </div>
+    <div>
+      <h3>เลือกข้อเสนอที่ดีที่สุดของร้าน</h3>
+      <ol>
+        <li>คำนวณ Q* ของทุกช่วง: Q* = √(2DS / (I·P))</li>
+        <li>ตรวจสถานะและเลือกล็อตที่ใช้คิดตามตารางด้านบน</li>
+        <li>คำนวณ TC ของทุกช่วงที่ล็อตนั้น</li>
+        <li>ช่วงที่ TC ต่ำสุดคือ <span class="pill best">ดีที่สุดของร้าน</span> TC ของช่วงนี้คือ TC<sub>best</sub> ที่ใช้เทียบทั้งหน้า</li>
+      </ol>
+      <div class="note">ในตัวอย่างภาพ ช่วง 3 ชนะที่ ฿24,725.00 ช่วง 2 ได้ ฿25,192.96 ช่วง 1 ได้ ฿25,740.48</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Worked example ============ -->
+<section class="page">
+  <h2><span class="no">14</span>ตัวอย่างคำนวณทีละขั้น (ข้อมูลตั้งต้น)</h2>
+  <p class="lead">D = 5,000 ชิ้น/ปี, S = ฿49/ครั้ง, I = 20% ตัวเลขทุกตัวด้านล่างตรงกับที่เว็บแสดง</p>
+  <h3>ขั้นที่ 1–3: ข้อเสนอที่ดีที่สุดของร้าน</h3>
+  <table class="t">
+    <tr><th>ช่วง</th><th class="n">P</th><th>Q* = √(2·5,000·49 / (0.2·P))</th><th>ช่วงล็อต</th><th>สถานะ</th><th class="n">Q ที่ใช้</th><th class="n">D·P</th><th class="n">(D/Q)·S</th><th class="n">(Q/2)·I·P</th><th class="n">TC</th></tr>
+    <tr><td>1</td><td class="n">5.00</td><td>√(490,000 / 1.00) = 700.0 → 700</td><td>0–999</td><td>ใช้ได้</td><td class="n">700</td><td class="n">25,000.00</td><td class="n">350.00</td><td class="n">350.00</td><td class="n">25,700.00</td></tr>
+    <tr class="hl"><td>2</td><td class="n">4.80</td><td>√(490,000 / 0.96) = 714.4 → 714</td><td>1,000–1,999</td><td>ปรับขึ้น</td><td class="n">1,000</td><td class="n">24,000.00</td><td class="n">245.00</td><td class="n">480.00</td><td class="n">24,725.00</td></tr>
+    <tr><td>3</td><td class="n">4.75</td><td>√(490,000 / 0.95) = 718.2 → 718</td><td>2,000 ขึ้นไป</td><td>ปรับขึ้น</td><td class="n">2,000</td><td class="n">23,750.00</td><td class="n">122.50</td><td class="n">950.00</td><td class="n">24,822.50</td></tr>
+  </table>
+  <p>TC ต่ำสุดคือช่วง 2 → <b>ข้อเสนอที่ดีที่สุดของร้าน = 1,000 ชิ้นที่ ฿4.80, TC<sub>best</sub> = ฿24,725.00</b></p>
+  <div class="grid2">
+    <div>
+      <h3>ขั้นที่ 4: ข้อเสนอแนะนำ</h3>
+      <div class="formula">Pn = ฿4.80 (ราคาที่ดีที่สุดของร้าน)<br>Qn = Q*(4.80) = 714 ชิ้น</div>
+      <h3>ขั้นที่ 5: TC ของข้อเสนอ</h3>
+      <div class="formula">D·Pn = 5,000 × 4.80 = 24,000.00<br>(D/Qn)·S = (5,000 / 714) × 49 = 343.14<br>(Qn/2)·I·Pn = 357 × 0.20 × 4.80 = 342.72<br>TC = <b>฿24,685.86</b></div>
+    </div>
+    <div>
+      <h3>ขั้นที่ 6: เทียบกับร้าน</h3>
+      <div class="formula">ประหยัด = 24,725.00 − 24,685.86 = <b>฿39.14/ปี</b> (0.16%)<br>สั่ง 5,000 / 714 = 7.0 ครั้ง/ปี ทุก 365 × 714 / 5,000 = 52 วัน<br>สต็อกเฉลี่ย 714 / 2 = 357 ชิ้น (ร้าน 1,000 / 2 = 500 ชิ้น)</div>
+      <h3>ขั้นที่ 7: ราคาเท่าทุนที่ 714 ชิ้น</h3>
+      <div class="formula">P<sub>be</sub> = (24,725 − 343.14) / (5,000 + 714 × 0.2 / 2) = <b>฿4.808</b><br>ขอ ฿4.80 &lt; ฿4.808 → ✓ ได้ประโยชน์</div>
+      <div class="note good">ประโยคที่ใช้ยื่นร้าน (มาจากช่องสรุปในการ์ดผลลัพธ์): ขอราคา ฿4.80 ที่ล็อต 714 ชิ้น โดยสัญญาซื้อรวม 5,000 ชิ้น/ปี: TC ลดจาก ฿24,725 เหลือ ฿24,686 (ประหยัด ฿39/ปี) และสต็อกเฉลี่ยเปลี่ยนจาก 500 เป็น 357 ชิ้น</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Header actions and link ============ -->
+<section class="page">
+  <h2><span class="no">15</span>ปุ่มด้านบนและลิงก์</h2>
+  <div class="grid2">
+    <div>
+      <figure style="max-width:230pt"><img src="img/copied.png" alt=""><figcaption>หลังกด "คัดลอกลิงก์" ปุ่มจะขึ้น "คัดลอกแล้ว" 2 วินาที</figcaption></figure>
+      <h3>คัดลอกลิงก์</h3>
+      <p>ทุกค่าที่ตั้งไว้ถูกเก็บในที่อยู่เว็บ (ส่วนหลังเครื่องหมาย #) และอัปเดตทุกครั้งที่ปรับค่า ปุ่มนี้คัดลอกที่อยู่ปัจจุบัน ส่งให้คนอื่นเปิดแล้วจะเห็นหน้าเดียวกันทุกตัวเลข ถ้าเบราว์เซอร์ไม่อนุญาตให้เข้าถึง clipboard ปุ่มจะขึ้น "คัดลอกไม่ได้" ให้คัดลอกจากแถบที่อยู่เองแทน</p>
+      <h3>รีเซ็ต</h3>
+      <p>กลับไปใช้ข้อมูลตั้งต้น (Bee Beauty) ทุกช่อง รวมถึงตารางส่วนลด และล้างข้อเสนอที่ตรึงไว้ กลับเป็นค่าแนะนำ</p>
+    </div>
+    <div>
+      <h3>ค่าที่เก็บในลิงก์</h3>
+      <table class="t">
+        <tr><th>ส่วนในลิงก์</th><th>ค่า</th><th>ตัวอย่าง</th></tr>
+        <tr><td><code>d</code></td><td>D</td><td><code>d=5000</code></td></tr>
+        <tr><td><code>s</code></td><td>S</td><td><code>s=49</code></td></tr>
+        <tr><td><code>i</code></td><td>I เป็น %</td><td><code>i=20</code></td></tr>
+        <tr><td><code>t</code></td><td>ตาราง สั่งตั้งแต่:ราคา คั่นด้วย ,</td><td><code>t=0:5,1000:4.8,2000:4.75</code></td></tr>
+        <tr><td><code>q</code>, <code>p</code></td><td>ล็อตและราคาที่ขอ (มีเมื่อปรับเอง)</td><td><code>q=714&amp;p=4.8</code></td></tr>
+      </table>
+      <p>ตัวอย่างลิงก์ของข้อเสนอ 1,400 ชิ้นที่ ฿4.80:</p>
+      <div class="formula" style="font-size:9.5pt">https://ad-xerline.github.io/QDM/#d=5000&amp;s=49&amp;i=20&amp;t=0:5,1000:4.8,2000:4.75&amp;q=1400&amp;p=4.8</div>
+      <p class="small">ถ้าแก้ลิงก์เองแล้วใส่ค่าผิด เช่น <code>d=-5</code> เว็บจะใช้ค่าตั้งต้นแทนเฉพาะช่องนั้น ส่วนอื่นยังใช้ค่าจากลิงก์</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Screen sizes ============ -->
+<section class="page">
+  <h2><span class="no">16</span>ขนาดจอ</h2>
+  <div class="grid2" style="grid-template-columns: 1fr 200pt">
+    <div>
+      <table class="t">
+        <tr><th>จอ</th><th>รูปแบบ</th></tr>
+        <tr><td>กว้าง ≥ 1200 px และสูง ≥ 680 px</td><td>Dashboard จอเดียว ไม่เลื่อนหน้า กราฟสองรูปอยู่คู่กัน แถบด้านข้างและตารางเลื่อนดูภายในกรอบได้ถ้าข้อมูลยาว</td></tr>
+        <tr><td>สูงไม่ถึง 980 px</td><td>ซ่อนบรรทัดเล็กใต้ตัวเลขในการ์ดผลลัพธ์หลัก</td></tr>
+        <tr><td>สูง 680–860 px (เช่น 1366×768)</td><td>ซ่อนสูตร คำอธิบายรอง และบรรทัดเล็กใต้ตัวชี้วัด ให้กราฟสูงขึ้น</td></tr>
+        <tr><td>แคบกว่า 1200 px หรือเตี้ยกว่า 680 px</td><td>เรียงลงล่าง เลื่อนหน้าได้</td></tr>
+        <tr><td>มือถือ (แคบกว่า 900 px)</td><td>คอลัมน์เดียว แถบสมมติฐานอยู่บนสุด ตามด้วยผลลัพธ์ กราฟ และตาราง</td></tr>
+      </table>
+      <p>กราฟทั้งสองวาดตามขนาดกรอบจริง ตัวอักษรบนกราฟจึงอ่านได้ทุกขนาดจอ และวาดใหม่เมื่อย่อหรือขยายหน้าต่าง</p>
+      <div class="note">ถ้าจะใช้ประกอบการนำเสนอ แนะนำให้เปิดเต็มจอ (F11) บนเครื่องที่ต่อโปรเจกเตอร์ ถ้าใช้ Windows ที่ตั้งขยายหน้าจอ 125% หรือ 150% พื้นที่ใช้งานจริงจะเล็กลง เว็บจะซ่อนข้อความรองให้อัตโนมัติ</div>
+    </div>
+    <figure class="phone"><img src="img/mobile.png" alt=""><figcaption>ความกว้าง 390 px (มือถือ) เลื่อนลงมาถึงส่วนผลลัพธ์</figcaption></figure>
+  </div>
+</section>
+
+<!-- ============ Workflow + troubleshooting ============ -->
+<section class="page">
+  <h2><span class="no">17</span>ขั้นตอนใช้งานจริง และการแก้ปัญหา</h2>
+  <div class="grid2">
+    <div>
+      <h3>เตรียมข้อเสนอก่อนคุยกับร้าน</h3>
+      <ol>
+        <li>กรอก D, S, I ของธุรกิจเรา</li>
+        <li>กรอกตารางส่วนลดตามที่ร้านเสนอ ตรวจว่าไม่มีกรอบแดง</li>
+        <li>อ่านหัวกราฟ 1 ว่าข้อเสนอใดของร้านดีที่สุด และ TC<sub>best</sub> เท่าไร</li>
+        <li>กด <b>ใช้ค่าแนะนำ</b> เพื่อดูข้อเสนอตั้งต้น: ราคาเดิม ล็อตเท่า EOQ</li>
+        <li>ถ้าร้านไม่ยอมล็อตนั้น ให้ลาก ◆ บนกราฟ 1 หาล็อตอื่น ดูในกราฟ 2 ว่าที่ล็อตนั้นต้องได้ราคาไม่เกินเท่าไร (เส้นเขียว)</li>
+        <li>ปรับราคาที่ขอให้ ◆ อยู่ในโซนสีเขียว การ์ดผลลัพธ์จะเป็นสีเขียว</li>
+        <li>ใช้ประโยคในช่องสรุปเป็นข้อเสนอ และกด <b>คัดลอกลิงก์</b> เก็บไว้หรือส่งให้ทีม</li>
+      </ol>
+      <h3>ข้อควรรู้ของแบบจำลอง</h3>
+      <ul>
+        <li>สมมติว่าความต้องการคงที่ทั้งปี ของมาครบทันทีที่สั่ง และไม่มีของขาด (สมมติฐานเดียวกับ EOQ)</li>
+        <li>ราคาเป็นแบบ all-units: ทุกชิ้นในล็อตได้ราคาของช่วงนั้น</li>
+        <li>Q* ปัดเป็นจำนวนเต็มที่ใกล้ที่สุด ตัวเลขจึงอาจต่างจากการคิดมือแบบไม่ปัดเล็กน้อย</li>
+      </ul>
+    </div>
+    <div>
+      <h3>แก้ปัญหา</h3>
+      <table class="t">
+        <tr><th style="width:38%">อาการ</th><th>วิธีแก้</th></tr>
+        <tr><td>ตัวเลขไม่เปลี่ยนเมื่อปรับค่า</td><td>หาช่องที่มีกรอบแดง เว็บค้างผลล่าสุดที่ถูกต้องไว้จนกว่าจะแก้ครบ</td></tr>
+        <tr><td>หน้าตาเพี้ยน ส่วนต่าง ๆ ซ้อนกันหลังอัปเดตเว็บ</td><td>เบราว์เซอร์ใช้ไฟล์เก่าจาก cache กด Ctrl + F5</td></tr>
+        <tr><td>เปิดไฟล์ index.html ตรง ๆ แล้วหน้าว่าง</td><td>เว็บต้องเปิดผ่าน server ใช้ลิงก์ GitHub Pages หรือรัน <code>python serve.py</code> แล้วเปิด http://localhost:8765</td></tr>
+        <tr><td>ตัวอักษรไทยเป็นฟอนต์อื่น</td><td>ฟอนต์โหลดจาก Google Fonts ถ้าไม่มีอินเทอร์เน็ต เว็บใช้ฟอนต์ของเครื่องแทน การคำนวณไม่เปลี่ยน</td></tr>
+        <tr><td>กด "คัดลอกลิงก์" แล้วขึ้น "คัดลอกไม่ได้"</td><td>คัดลอกที่อยู่จากแถบที่อยู่ของเบราว์เซอร์แทน ได้ผลเหมือนกัน</td></tr>
+        <tr><td>อยากให้ข้อเสนอกลับไปเปลี่ยนตาม D, S, I</td><td>กด "ใช้ค่าแนะนำ"</td></tr>
+        <tr><td>เพิ่มช่วงไม่ได้</td><td>มีครบ 6 ช่วงแล้ว ลบช่วงที่ไม่ใช้ก่อน</td></tr>
+        <tr><td>แกนตั้งกราฟ 1 กว้างขึ้นมาก</td><td>ล็อตที่ขอเล็กหรือใหญ่มากจน TC พุ่งสูง แกนยืดตามเพื่อให้ ◆ ยังอยู่ในกรอบ</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
