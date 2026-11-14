@@ -206,6 +206,11 @@ function drawCharts(v) {
   pendingView = v;
 }
 
+// Charts draw at their on-screen size, so redraw when that size changes.
+const chartResize = new ResizeObserver(() => { if (view) drawCharts(view); });
+chartResize.observe($('tc-chart'));
+chartResize.observe($('price-chart'));
+
 function render() {
   const { ok, errors } = validate(state);
   showErrors(errors);

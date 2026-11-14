@@ -78,35 +78,14 @@
       <p class="hint">H = I × ราคา จึงต่างกันในแต่ละช่วงราคา</p>
     </aside>
 
-    <main class="cards">
-      <section class="card" aria-labelledby="c1-title">
-        <div class="card-head">
-          <span class="step">1</span>
-          <div>
-            <h2 id="c1-title">ข้อเสนอปัจจุบันของร้าน</h2>
-            <p class="sub" id="c1-sub"></p>
-          </div>
-        </div>
-        <svg id="tc-chart" class="chart" viewBox="0 0 800 360" preserveAspectRatio="xMidYMid meet"></svg>
-      </section>
-
-      <section class="card" aria-labelledby="c2-title">
-        <div class="card-head">
-          <span class="step">2</span>
-          <div>
-            <h2 id="c2-title">ราคาเท่าทุนของแต่ละขนาดล็อต</h2>
-            <p class="sub">ราคาสูงสุดที่ขอได้ในแต่ละล็อต โดย TC ยังไม่แย่กว่าข้อเสนอที่ดีที่สุดของร้าน</p>
-          </div>
-        </div>
-        <svg id="price-chart" class="chart" viewBox="0 0 800 360" preserveAspectRatio="xMidYMid meet"></svg>
-      </section>
-
+    <main class="workspace">
+      <div class="workbench">
       <section class="card card-proposal" aria-labelledby="c3-title">
+        <div class="proposal-controls">
         <div class="card-head">
-          <span class="step">3</span>
           <div>
             <h2 id="c3-title">ข้อเสนอต่อรอง</h2>
-            <p class="sub">เลื่อนล็อตและราคาที่จะขอ หรือลากจุด ◆ บนกราฟ 1</p>
+            <p class="sub">เลื่อนค่า หรือลาก ◆ บนกราฟ 1</p>
           </div>
           <button type="button" id="suggest" class="btn btn-ghost btn-sm">ใช้ค่าแนะนำ</button>
         </div>
@@ -136,22 +115,49 @@
           </div>
         </div>
 
-        <div aria-live="polite">
+        </div>
+        <div class="proposal-results" aria-live="polite">
           <div class="verdict" id="verdict"></div>
           <dl class="stats">
             <div class="stat stat-main"><dt>TC ใหม่ต่อปี</dt><dd id="out-tc"></dd><span class="meta" id="out-tc-meta"></span></div>
             <div class="stat stat-main"><dt id="out-saving-label">ประหยัดต่อปี</dt><dd id="out-saving"></dd><span class="meta" id="out-saving-meta"></span></div>
             <div class="stat"><dt>จำนวนครั้งที่สั่ง</dt><dd id="out-orders"></dd><span class="meta" id="out-orders-meta"></span></div>
             <div class="stat"><dt>สต็อกเฉลี่ย</dt><dd id="out-inv"></dd><span class="meta" id="out-inv-meta"></span></div>
-            <div class="stat"><dt>ราคาเท่าทุนที่ล็อตนี้</dt><dd id="out-be"></dd><span class="meta">ขอราคาไม่เกินนี้จึงคุ้ม</span></div>
+            <div class="stat"><dt>ราคาเท่าทุน</dt><dd id="out-be"></dd><span class="meta">ขอราคาไม่เกินนี้จึงคุ้ม</span></div>
           </dl>
           <p class="summary" id="summary"></p>
         </div>
       </section>
 
+        <div class="charts">
+          <section class="card" aria-labelledby="c1-title">
+            <div class="card-head">
+              <span class="step">1</span>
+              <div>
+                <h2 id="c1-title">ข้อเสนอปัจจุบันของร้าน</h2>
+                <p class="sub" id="c1-sub"></p>
+              </div>
+            </div>
+            <svg id="tc-chart" class="chart" viewBox="0 0 800 360" preserveAspectRatio="xMidYMid meet"></svg>
+          </section>
+
+          <section class="card" aria-labelledby="c2-title">
+            <div class="card-head">
+              <span class="step">2</span>
+              <div>
+                <h2 id="c2-title">ราคาเท่าทุนของแต่ละขนาดล็อต</h2>
+                <p class="sub">ราคาสูงสุดที่ขอได้ในแต่ละล็อต โดย TC ยังไม่แย่กว่าข้อเสนอที่ดีที่สุดของร้าน</p>
+              </div>
+            </div>
+            <svg id="price-chart" class="chart" viewBox="0 0 800 360" preserveAspectRatio="xMidYMid meet"></svg>
+          </section>
+
+        </div>
+      </div>
+
       <section class="card card-wide" aria-labelledby="c4-title">
         <div class="card-head">
-          <span class="step">4</span>
+          <span class="step">3</span>
           <div>
             <h2 id="c4-title">ตารางเปรียบเทียบ</h2>
             <p class="sub">ทุกช่วงราคาของร้าน เทียบกับข้อเสนอต่อรอง</p>

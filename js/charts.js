@@ -1,9 +1,16 @@
 // SVG charts. Pure helpers are exported for tests; render functions touch the DOM only when called.
 import { tc, breakEvenPrice } from './model.js';
 
-const W = 800, H = 360;
 const M = { top: 28, right: 24, bottom: 56, left: 92 };
-const X0 = M.left, X1 = W - M.right, Y0 = M.top, Y1 = H - M.bottom;
+// Drawing size follows the SVG's on-screen box so text stays 13px at any width.
+let W = 800, H = 360, X0, X1, Y0, Y1;
+function fit(svg) {
+  W = Math.max(280, Math.round(svg.clientWidth) || 800);
+  H = Math.max(240, Math.round(svg.clientHeight) || 360);
+  X0 = M.left; X1 = W - M.right; Y0 = M.top; Y1 = H - M.bottom;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+}
+fit({ clientWidth: 0, clientHeight: 0, setAttribute() {} });
 const SAMPLES = 200;
 const NS = 'http://www.w3.org/2000/svg';
 
@@ -28,7 +35,7 @@ export function tcYDomain(view, xMax) {
   const lo = Math.min(tcBest, view.proposal.cost.total);
   let span = Math.max(...totals, view.proposal.cost.total) - lo;
   if (span <= 0) span = lo * 0.01;
-  return [lo - 0.15 * span, tcBest + 1.6 * span];
+  return [lo - 0.4 * span, tcBest + 1.6 * span]; // room below the lines for labels
 }
 
 function niceTicks(lo, hi, count = 5) {
@@ -141,6 +148,7 @@ function ensureTcChart(svg) {
 
 export function renderTcChart(svg, view, onDragQ) {
   const s = ensureTcChart(svg);
+  fit(svg);
   const { params, results, best, qn, pn, proposal } = view;
   const xMax = xMaxFor(view);
   const xs = linearScale([1, xMax], [X0, X1]);
@@ -166,7 +174,7 @@ export function renderTcChart(svg, view, onDragQ) {
   // best TC reference line
   const yb = ys.to(best.cost.total);
   plot.append(el('line', { x1: X0, x2: X1, y1: yb, y2: yb }, 'stroke:var(--text);stroke-width:1.5;stroke-dasharray:8 5;opacity:.55'));
-  g.append(text(X1 - 4, yb - 8, 'TC ที่ดีที่สุดของร้าน', { 'text-anchor': 'end' }));
+  g.append(text(X1 - 4, yb + 18, 'TC ที่ดีที่สุดของร้าน', { 'text-anchor': 'end' }));
 
   // proposal curve at the asked price
   plot.append(el('path', { d: pathFor(q => tc(q, pn, params).total, 1, xMax, xs, ys), fill: 'none' },
@@ -200,7 +208,9 @@ export function renderTcChart(svg, view, onDragQ) {
   s.handle.setAttribute('transform', `translate(${px.toFixed(1)},${py.toFixed(1)})`);
   const labelX = Math.max(X0 + 70, Math.min(X1 - 70, px));
   s.label.setAttribute('x', labelX.toFixed(1));
-  s.label.setAttribute('y', (py + (py > Y1 - 40 ? -18 : 30)).toFixed(1));
+  // put the label on the side away from the best-offer line, where the other labels sit
+  const above = py < yb ? py - Y0 > 24 : py > Y1 - 40;
+  s.label.setAttribute('y', (py + (above ? -18 : 30)).toFixed(1));
 
   svg.setAttribute('aria-label',
     `กราฟ TC: ข้อเสนอที่ดีที่สุดของร้านคือ ${fmt(best.qty)} ชิ้นที่ ฿${fmt(best.price, 2)} TC ฿${fmt(best.cost.total)}; ` +
@@ -209,6 +219,7 @@ export function renderTcChart(svg, view, onDragQ) {
 
 // ---------- chart 2: break-even price vs Q ----------
 export function renderPriceChart(svg, view) {
+  fit(svg);
   const { params, tiers, results, best, qn, pn, proposal } = view;
   const xMax = xMaxFor(view);
   const xs = linearScale([1, xMax], [X0, X1]);
