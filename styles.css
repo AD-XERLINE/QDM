@@ -224,13 +224,18 @@ input[type=range]::-moz-range-thumb {
   .step { width: 26px; height: 26px; font-size: 13px; }
   .kpis { grid-template-columns: minmax(260px, 1fr) minmax(0, 2.2fr); align-items: center; gap: 16px; }
   .verdict { margin: 0 0 6px; padding: 4px 12px; font-size: 14px; }
-  .summary { margin: 0; padding: 6px 10px; font-size: 13px; line-height: 1.45; }
+  /* Fixed 3-line box: the good and bad sentences differ in length and must not move the charts. */
+  .summary {
+    margin: 0; padding: 6px 10px; font-size: 13px; line-height: 1.45;
+    height: calc(3 * 1.45em + 12px); overflow: hidden;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3;
+  }
   .stats { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
   .stat { padding: 6px 10px; }
   .stat dt { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .stat dd { font-size: 17px; }
   .stat-main dd { font-size: 22px; }
-  .stat .meta { font-size: 12px; line-height: 1.35; }
+  .stat .meta { font-size: 12px; line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .charts { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap); min-height: 0; }
   .charts .card { min-height: 0; }
   .charts .chart { flex: 1; min-height: 0; height: auto; }
