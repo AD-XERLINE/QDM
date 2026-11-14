@@ -206,11 +206,20 @@ export function renderTcChart(svg, view, onDragQ) {
   // proposal handle (kept across renders so pointer capture survives)
   const px = xs.to(qn), py = Math.max(Y0, Math.min(Y1, ys.to(proposal.cost.total)));
   s.handle.setAttribute('transform', `translate(${px.toFixed(1)},${py.toFixed(1)})`);
-  const labelX = Math.max(X0 + 70, Math.min(X1 - 70, px));
-  s.label.setAttribute('x', labelX.toFixed(1));
-  // put the label on the side away from the best-offer line, where the other labels sit
-  const above = py < yb ? py - Y0 > 24 : py > Y1 - 40;
-  s.label.setAttribute('y', (py + (above ? -18 : 30)).toFixed(1));
+  // put the label on the side away from the best-offer line, where the other labels sit;
+  // with no room below, put it beside the diamond instead of on top of the other labels
+  const beside = py >= yb && py > Y1 - 40;
+  if (beside) {
+    const left = px - X0 > X1 - px;
+    s.label.setAttribute('text-anchor', left ? 'end' : 'start');
+    s.label.setAttribute('x', (px + (left ? -18 : 18)).toFixed(1));
+    s.label.setAttribute('y', (py + 5).toFixed(1));
+  } else {
+    const above = py < yb && py - Y0 > 24;
+    s.label.setAttribute('text-anchor', 'middle');
+    s.label.setAttribute('x', Math.max(X0 + 70, Math.min(X1 - 70, px)).toFixed(1));
+    s.label.setAttribute('y', (py + (above ? -18 : 30)).toFixed(1));
+  }
 
   svg.setAttribute('aria-label',
     `กราฟ TC: ข้อเสนอที่ดีที่สุดของร้านคือ ${fmt(best.qty)} ชิ้นที่ ฿${fmt(best.price, 2)} TC ฿${fmt(best.cost.total)}; ` +

@@ -15,9 +15,10 @@ Web app หน้าเดียวสำหรับวิชา OM ใช้ E
 ## เปิดในเครื่อง
 
 ไฟล์ JavaScript เป็น ES modules จึงต้องเปิดผ่าน static server (เปิดไฟล์ตรง ๆ แบบ `file://` ไม่ได้)
+`serve.py` สั่งเบราว์เซอร์ไม่ให้ cache จึงเห็นการแก้ไขทันทีเมื่อ refresh
 
 ```bash
-python -m http.server 8765
+python serve.py
 ```
 
 แล้วเปิด http://localhost:8765
