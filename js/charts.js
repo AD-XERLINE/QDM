@@ -32,10 +32,17 @@ export function linearScale([d0, d1], [r0, r1]) {
 export function tcYDomain(view, xMax) {
   const totals = view.results.filter(r => r.cost).map(r => r.cost.total);
   const tcBest = view.best.cost.total;
-  const lo = Math.min(tcBest, view.proposal.cost.total);
-  let span = Math.max(...totals, view.proposal.cost.total) - lo;
-  if (span <= 0) span = lo * 0.01;
-  return [lo - 0.4 * span, tcBest + 1.6 * span]; // room below the lines for labels
+  const tcProp = view.proposal.cost.total;
+  // Scale from the shop's offers, not the proposal, so the diamond moves when the lot changes;
+  // the axis only stretches when the proposal would leave the chart.
+  // Floor: how far the best price's TC rises at Q*/2 or 2Q* (needed when there is one tier).
+  const { D, S, I } = view.params;
+  const curveRise = 0.25 * Math.sqrt(2 * D * S * I * view.best.price);
+  const span = Math.max(Math.max(...totals) - tcBest, curveRise);
+  return [
+    Math.min(tcBest - 0.4 * span, tcProp - 0.3 * span), // room below the lines for labels
+    Math.max(tcBest + 1.6 * span, tcProp + 0.3 * span),
+  ];
 }
 
 function niceTicks(lo, hi, count = 5) {

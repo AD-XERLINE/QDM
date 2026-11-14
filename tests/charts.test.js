@@ -27,3 +27,15 @@ test('tcYDomain ล้อมจุดสำคัญและไม่เริ�
   assert.ok(lo > 20000 && lo < 24685.86);
   assert.ok(hi > 25700);
 });
+
+test('tcYDomain ช่วงราคาเดียว: แกนไม่ซูมตามข้อเสนอ จุดจึงขยับได้', () => {
+  const tiers = [{ minQty: 0, price: 5 }];
+  const params = { D: 5000, S: 49, I: 0.11 };
+  const res = evaluateTiers(params, tiers);
+  const b = bestOffer(res);
+  const dom = qn => tcYDomain({ params, tiers, results: res, best: b, qn, pn: 5,
+    proposal: evaluateProposal(qn, 5, params, b) }, 3000);
+  assert.deepEqual(dom(780), dom(1406));
+  const [lo, hi] = dom(941);
+  assert.ok(hi - lo > 100);
+});
